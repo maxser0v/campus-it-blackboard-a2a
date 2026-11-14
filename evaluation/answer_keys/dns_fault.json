@@ -1,0 +1,9 @@
+{
+  "case_id": "dns_fault",
+  "ground_truth": "Campus DNS record resolution fault",
+  "required_invariants": [
+    "A diagnosis cites DNS NXDOMAIN measurements or resolver logs.",
+    "The response references the DNS runbook and includes a verification step.",
+    "The case does not reuse the database pool diagnosis from another case."
+  ]
+}

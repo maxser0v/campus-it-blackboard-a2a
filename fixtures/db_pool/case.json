@@ -1,0 +1,23 @@
+{
+  "case_id": "db_pool",
+  "title": "Student portal intermittent latency",
+  "symptoms": "Students report intermittent timeouts and slow page loads on the learning portal.",
+  "observed_at": "2026-11-06T09:00:00Z",
+  "metrics": [
+    {"source_id": "dbpool-metric-latency", "name": "request_latency_p95_ms", "value": 1840, "unit": "ms", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"},
+    {"source_id": "dbpool-metric-errors", "name": "request_error_rate_pct", "value": 8.2, "unit": "%", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"},
+    {"source_id": "dbpool-metric-traffic", "name": "request_rate_per_min", "value": 104, "unit": "requests/min", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"},
+    {"source_id": "dbpool-metric-cpu", "name": "app_cpu_pct", "value": 34, "unit": "%", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"},
+    {"source_id": "dbpool-metric-pool-active", "name": "db_pool_active_connections", "value": 40, "unit": "connections", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"},
+    {"source_id": "dbpool-metric-pool-limit", "name": "db_pool_max_connections", "value": 40, "unit": "connections", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"},
+    {"source_id": "dbpool-metric-pool-waits", "name": "db_pool_wait_count", "value": 27, "unit": "waits/5min", "observed_at": "2026-11-06T09:00:00Z", "scope": "learning-portal"}
+  ],
+  "logs": [
+    {"source_id": "dbpool-log-timeout-01", "timestamp": "2026-11-06T08:58:11Z", "service": "learning-portal", "level": "warning", "message": "Request timed out while waiting for a database connection", "fields": {"route": "/courses", "duration_ms": 3000}},
+    {"source_id": "dbpool-log-timeout-02", "timestamp": "2026-11-06T08:59:04Z", "service": "learning-portal", "level": "error", "message": "Database connection acquisition exceeded request deadline", "fields": {"route": "/assignments", "duration_ms": 3000}},
+    {"source_id": "dbpool-log-healthy-worker", "timestamp": "2026-11-06T08:59:19Z", "service": "learning-portal", "level": "info", "message": "Background worker completed scheduled sync", "fields": {"duration_ms": 88}}
+  ],
+  "changes": [
+    {"source_id": "dbpool-change-01", "timestamp": "2026-11-06T07:30:00Z", "service": "learning-portal", "change": "Routine application release 2026.11.06.1", "actor": "synthetic-release-bot", "status": "completed"}
+  ]
+}

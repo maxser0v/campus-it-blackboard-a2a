@@ -1,0 +1,10 @@
+{
+  "case_id": "db_pool",
+  "ground_truth": "Database connection pool exhaustion",
+  "required_invariants": [
+    "Initial latency and error evidence supports multiple explanations and is not decisive by itself.",
+    "A targeted pool query returns active connections at the configured limit and a nonzero wait count.",
+    "A diagnosis cites the targeted pool observation and preserves earlier competing hypotheses as revised or weakened.",
+    "The response references the database connection pool runbook and proposes checks before a bounded recovery action."
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "case_id": "missing_evidence",
+  "ground_truth": "Insufficient evidence to identify a root cause",
+  "required_invariants": [
+    "No unsupported root cause is accepted as supported.",
+    "An unavailable or empty targeted query remains visible as such.",
+    "The investigation ends unresolved or blocked with the missing fact identified."
+  ]
+}

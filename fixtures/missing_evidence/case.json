@@ -1,0 +1,17 @@
+{
+  "case_id": "missing_evidence",
+  "title": "Engineering lab service intermittent errors",
+  "symptoms": "Users report intermittent errors from the engineering lab reservation service.",
+  "observed_at": "2026-11-06T11:00:00Z",
+  "metrics": [
+    {"source_id": "missing-metric-latency", "name": "request_latency_p95_ms", "value": 720, "unit": "ms", "observed_at": "2026-11-06T11:00:00Z", "scope": "lab-reservations"},
+    {"source_id": "missing-metric-errors", "name": "request_error_rate_pct", "value": 6.1, "unit": "%", "observed_at": "2026-11-06T11:00:00Z", "scope": "lab-reservations"},
+    {"source_id": "missing-metric-traffic", "name": "request_rate_per_min", "value": 31, "unit": "requests/min", "observed_at": "2026-11-06T11:00:00Z", "scope": "lab-reservations"},
+    {"source_id": "missing-metric-cpu", "name": "app_cpu_pct", "value": 26, "unit": "%", "observed_at": "2026-11-06T11:00:00Z", "scope": "lab-reservations"}
+  ],
+  "logs": [
+    {"source_id": "missing-log-01", "timestamp": "2026-11-06T10:59:10Z", "service": "lab-reservations", "level": "warning", "message": "Request failed with an upstream error", "fields": {"route": "/reserve", "status": 502}},
+    {"source_id": "missing-log-02", "timestamp": "2026-11-06T10:59:43Z", "service": "lab-reservations", "level": "warning", "message": "Request failed with an upstream error", "fields": {"route": "/availability", "status": 502}}
+  ],
+  "changes": []
+}

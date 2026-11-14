@@ -1,0 +1,24 @@
+.venv/
+.data/
+.env
+*.db
+*.sqlite
+*.sqlite3
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
+logs/
+traces/
+!traces/sanitized/
+
+# Local rendering work and desktop metadata
+/tmp/
+.DS_Store
+
+# Original course handouts are kept locally
+/*.docx
+

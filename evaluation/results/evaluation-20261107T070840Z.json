@@ -1,0 +1,108 @@
+{
+  "created_at": "2026-11-07T07:08:40.014943+00:00",
+  "model_mode": "offline",
+  "provider_model": null,
+  "repeat": 1,
+  "cases": [
+    {
+      "case_id": "db_pool",
+      "problem_id": "problem-da476ebc4ace4a07a1154b8b41d1fd04",
+      "expected_ground_truth_label": "Database connection pool exhaustion",
+      "status": "completed",
+      "operational_failure": false,
+      "reason": "current_supported_diagnosis_and_solution_accepted",
+      "elapsed_seconds": 1.186,
+      "dispatch_count": 9,
+      "entry_counts": {
+        "observations": 2,
+        "hypotheses": 2,
+        "evidence_requests": 1,
+        "reviews": 3,
+        "solutions": 1
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": true,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": true,
+        "response_reviewed_at_current_revision": true,
+        "response_evidence_references_resolve": true,
+        "response_has_runbook_reference": true,
+        "requested_evidence_was_linked": true,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "offline"
+    },
+    {
+      "case_id": "dns_fault",
+      "problem_id": "problem-b7b916d5660c4c7ab02d80da50a44c20",
+      "expected_ground_truth_label": "Campus DNS record resolution fault",
+      "status": "completed",
+      "operational_failure": false,
+      "reason": "current_supported_diagnosis_and_solution_accepted",
+      "elapsed_seconds": 0.569,
+      "dispatch_count": 5,
+      "entry_counts": {
+        "observations": 1,
+        "hypotheses": 1,
+        "evidence_requests": 0,
+        "reviews": 2,
+        "solutions": 1
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": true,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": true,
+        "response_reviewed_at_current_revision": true,
+        "response_evidence_references_resolve": true,
+        "response_has_runbook_reference": true,
+        "requested_evidence_was_linked": false,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "offline"
+    },
+    {
+      "case_id": "missing_evidence",
+      "problem_id": "problem-3a01057dc11c46139b84d084e496c1da",
+      "expected_ground_truth_label": "Insufficient evidence to identify a root cause",
+      "status": "unresolved",
+      "operational_failure": false,
+      "reason": "hypothesis_review_did_not_produce_a_review",
+      "elapsed_seconds": 0.593,
+      "dispatch_count": 5,
+      "entry_counts": {
+        "observations": 2,
+        "hypotheses": 3,
+        "evidence_requests": 1,
+        "reviews": 1,
+        "solutions": 0
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": true,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": false,
+        "response_reviewed_at_current_revision": false,
+        "response_evidence_references_resolve": false,
+        "response_has_runbook_reference": false,
+        "requested_evidence_was_linked": false,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false,
+        "missing_evidence_unavailable_request_recorded": true,
+        "missing_evidence_stopped_for_evidence_reason": false,
+        "missing_evidence_ends_without_accepted_cause": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "offline"
+    }
+  ],
+  "interpretation": "These are measured fixture-run checks, not a statistical performance claim. Review underlying evidence manually."
+}

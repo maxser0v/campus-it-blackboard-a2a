@@ -1,0 +1,21 @@
+{
+  "case_id": "dns_fault",
+  "title": "Library portal intermittently unreachable",
+  "symptoms": "Some campus clients cannot open the library portal; other requests are slow but succeed.",
+  "observed_at": "2026-11-06T10:00:00Z",
+  "metrics": [
+    {"source_id": "dns-metric-latency", "name": "request_latency_p95_ms", "value": 940, "unit": "ms", "observed_at": "2026-11-06T10:00:00Z", "scope": "library-portal"},
+    {"source_id": "dns-metric-errors", "name": "request_error_rate_pct", "value": 14.6, "unit": "%", "observed_at": "2026-11-06T10:00:00Z", "scope": "library-portal"},
+    {"source_id": "dns-metric-traffic", "name": "request_rate_per_min", "value": 76, "unit": "requests/min", "observed_at": "2026-11-06T10:00:00Z", "scope": "library-portal"},
+    {"source_id": "dns-metric-cpu", "name": "app_cpu_pct", "value": 29, "unit": "%", "observed_at": "2026-11-06T10:00:00Z", "scope": "library-portal"},
+    {"source_id": "dns-metric-nxdomain", "name": "dns_nxdomain_rate_pct", "value": 31.0, "unit": "%", "observed_at": "2026-11-06T10:00:00Z", "scope": "library-portal"}
+  ],
+  "logs": [
+    {"source_id": "dns-log-lookup-01", "timestamp": "2026-11-06T09:58:02Z", "service": "campus-resolver", "level": "warning", "message": "NXDOMAIN returned for library-portal.campus.example", "fields": {"resolver": "dns-02", "client_vlan": "student-wifi"}},
+    {"source_id": "dns-log-lookup-02", "timestamp": "2026-11-06T09:59:37Z", "service": "campus-resolver", "level": "error", "message": "Authoritative lookup returned no address for library-portal.campus.example", "fields": {"resolver": "dns-02", "client_vlan": "student-wifi"}},
+    {"source_id": "dns-log-other", "timestamp": "2026-11-06T09:59:59Z", "service": "library-portal", "level": "info", "message": "Health endpoint responded", "fields": {"status": 200}}
+  ],
+  "changes": [
+    {"source_id": "dns-change-01", "timestamp": "2026-11-06T08:45:00Z", "service": "campus-dns", "change": "Zone record maintenance", "actor": "synthetic-operator", "status": "completed"}
+  ]
+}
