@@ -211,3 +211,43 @@ def test_fresh_unresolved_diagnosis_does_not_reuse_stale_supported_cause() -> No
     assert isinstance(result, TerminalPlan)
     assert result.status == "unresolved"
     assert result.reason == "accepted_solution_has_incomplete_references"
+
+
+def test_supported_hypothesis_review_precedes_optional_diagnosis_request():
+    obs = entry('obs', 'observation', {'tool_name': 'query_metrics'})
+    hyp = entry('hyp', 'hypothesis', {'status': 'supported', 'supporting_evidence_ids': ['obs']})
+    request = entry('optional', 'evidence_request', {'requested_tool': 'query_logs', 'query': {'contains': 'timeout'}, 'status': 'open'})
+    request['source_agent'] = 'diagnosis'
+    result = choose_next_action(snapshot(obs, hyp, request))
+    assert isinstance(result, DispatchPlan)
+    assert result.role == 'review'
+
+
+def test_reviewer_request_still_precedes_supported_hypothesis_review():
+    obs = entry('obs', 'observation', {'tool_name': 'query_metrics'})
+    hyp = entry('hyp', 'hypothesis', {'status': 'supported', 'supporting_evidence_ids': ['obs']})
+    request = entry('required', 'evidence_request', {'requested_tool': 'query_logs', 'query': {'contains': 'timeout'}, 'status': 'open'})
+    request['source_agent'] = 'review'
+    result = choose_next_action(snapshot(obs, hyp, request))
+    assert isinstance(result, DispatchPlan)
+    assert result.role == 'evidence'
+
+
+def test_equivalent_completed_query_does_not_trigger_another_evidence_task():
+    obs = entry('obs', 'observation', {'tool_name': 'query_logs', 'query': {'contains': 'timeout error', 'service': None, 'level': None, 'limit': 20}})
+    req = entry('again', 'evidence_request', {'requested_tool': 'query_logs', 'query': {'contains': 'error|timeout'}, 'status': 'open'})
+    result = choose_next_action(snapshot(obs, req))
+    assert isinstance(result, DispatchPlan)
+    assert result.role == 'diagnosis'
+
+
+def test_accepted_supported_diagnosis_reaches_response_without_optional_work():
+    obs = entry('obs', 'observation', {'tool_name': 'query_metrics'})
+    hyp = entry('hyp', 'hypothesis', {'status': 'supported', 'supporting_evidence_ids': ['obs']})
+    alternative = entry('alt', 'hypothesis', {'status': 'rejected', 'supporting_evidence_ids': [], 'observation_refs': [{'entry_id': 'obs', 'revision': 1}]})
+    review = entry('review', 'review', {'target_entry_id': 'hyp', 'target_revision': 1, 'verdict': 'accept'})
+    request = entry('optional', 'evidence_request', {'requested_tool': 'query_logs', 'query': {'contains': 'timeout'}, 'status': 'open'})
+    request['source_agent'] = 'diagnosis'
+    result = choose_next_action(snapshot(obs, hyp, alternative, review, request))
+    assert isinstance(result, DispatchPlan)
+    assert result.role == 'response'

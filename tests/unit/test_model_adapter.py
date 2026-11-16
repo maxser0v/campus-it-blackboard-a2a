@@ -95,3 +95,50 @@ def test_live_mode_requires_configuration_but_not_a_network_call() -> None:
     adapter = model_from_settings(settings)
     assert isinstance(adapter, OpenAICompatibleAdapter)
     assert adapter.endpoint == "http://localhost:9999/v1/chat/completions"
+
+
+def test_rate_limit_waits_then_retries(monkeypatch):
+    import io
+    calls = []
+    waits = []
+    def respond(request, timeout):
+        calls.append(request)
+        if len(calls) == 1:
+            raise urllib.error.HTTPError(request.full_url, 429, 'limited', {'Retry-After': '3'}, io.BytesIO(b'Please try again in 4s'))
+        return FakeHTTPResponse({'choices': [{'message': {'content': '{"ok":true}'}}]})
+    monkeypatch.setattr('campus_blackboard.model_adapter.urllib.request.urlopen', respond)
+    monkeypatch.setattr('campus_blackboard.model_adapter.time.sleep', waits.append)
+    adapter = OpenAICompatibleAdapter('http://localhost/v1', 'test')
+    result = asyncio.run(adapter.complete(role='evidence', purpose='test', instructions='JSON', context={}, output_schema={}))
+    assert json.loads(result) == {'ok': True}
+    assert len(calls) == 2
+    assert waits == [4.25]
+
+
+def test_rate_limit_retries_are_bounded(monkeypatch):
+    import io
+    calls = []
+    def respond(request, timeout):
+        calls.append(request)
+        raise urllib.error.HTTPError(request.full_url, 429, 'limited', {}, io.BytesIO(b'rate limited'))
+    monkeypatch.setattr('campus_blackboard.model_adapter.urllib.request.urlopen', respond)
+    monkeypatch.setattr('campus_blackboard.model_adapter.time.sleep', lambda delay: None)
+    adapter = OpenAICompatibleAdapter('http://localhost/v1', 'test')
+    with pytest.raises(ModelAdapterError, match='HTTP 429'):
+        asyncio.run(adapter.complete(role='evidence', purpose='test', instructions='JSON', context={}, output_schema={}))
+    assert len(calls) == 5
+
+
+def test_provider_json_generation_failure_retries(monkeypatch):
+    import io
+    calls = []
+    def respond(request, timeout):
+        calls.append(request)
+        if len(calls) == 1:
+            raise urllib.error.HTTPError(request.full_url, 400, 'invalid JSON', {}, io.BytesIO(b'{"error":{"code":"json_validate_failed"}}'))
+        return FakeHTTPResponse({'choices': [{'message': {'content': '{}'}}]})
+    monkeypatch.setattr('campus_blackboard.model_adapter.urllib.request.urlopen', respond)
+    monkeypatch.setattr('campus_blackboard.model_adapter.time.sleep', lambda delay: None)
+    adapter = OpenAICompatibleAdapter('http://localhost/v1', 'test')
+    assert asyncio.run(adapter.complete(role='diagnosis', purpose='test', instructions='JSON', context={}, output_schema={})) == '{}'
+    assert len(calls) == 2

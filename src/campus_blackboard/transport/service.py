@@ -6,6 +6,7 @@ import asyncio
 import hmac
 import inspect
 import json
+import logging
 from contextvars import ContextVar
 from typing import Any, Awaitable, Callable, Mapping
 
@@ -92,6 +93,7 @@ class StructuredAgentExecutor(AgentExecutor):
                 raise TypeError("A2A service handlers must return a JSON object")
             result = json.loads(json.dumps(result, ensure_ascii=False, allow_nan=False, default=_json_default))
         except Exception as exc:
+            logging.getLogger(__name__).exception("%s service request failed", self.role)
             result = _error("request_failed", "The service could not process this request.", error_type=type(exc).__name__)
 
         await event_queue.enqueue_event(structured_message(result, role=Role.ROLE_AGENT))
@@ -131,6 +133,7 @@ class StructuredAgentExecutor(AgentExecutor):
             await updater.add_artifact(artifact.parts, name="result", last_chunk=True)
             await updater.complete()
         except Exception as exc:
+            logging.getLogger(__name__).exception("%s specialist task %s failed", self.role, task_id)
             failure = _error(
                 "request_failed",
                 "The service could not process this request.",

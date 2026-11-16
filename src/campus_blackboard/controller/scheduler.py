@@ -8,6 +8,9 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 
+from ..tools.queries import already_observed
+
+
 Entry = Mapping[str, Any]
 Snapshot = Mapping[str, Any]
 
@@ -68,6 +71,8 @@ def _active_requests(entries: Sequence[Entry]) -> list[Entry]:
             and str(_data(o).get("fulfilled_request_status", "")).lower() == "unavailable"
             for o in observations
         ):
+            continue
+        if already_observed(data.get("requested_tool"), data.get("query"), entries):
             continue
         requests.append(entry)
     return requests
@@ -217,25 +222,6 @@ def _choose_next_action(
     )
     requests = _active_requests(entries)
 
-    # An outstanding information request takes priority over general analysis.
-    # The specialist chooses only from its allowlisted fixture tools.
-    if requests:
-        request = requests[0]
-        request_ref = _revision_ref(request)
-        plan = _make_dispatch(
-            "evidence",
-            "collect_evidence",
-            {"problem": problem.get("problem_id"), "request": request_ref},
-            {"rule": "open_evidence_request", "request": request_ref},
-            seen,
-        )
-        if plan is not None:
-            return plan
-        # A request can be unavailable. _active_requests removes it after the
-        # linked observation records that result, so a repeated key here means
-        # the specialist ran but failed to record any outcome.
-        return TerminalPlan("unresolved", "evidence_request_not_satisfied")
-
     if not observations:
         plan = _make_dispatch(
             "evidence",
@@ -265,6 +251,41 @@ def _choose_next_action(
         latest = _latest_review(matched)
         if latest is not None and _latest_verdict(matched) == "reject":
             rejected_reviews.append(latest)
+
+    supported = [h for h in fresh_hypotheses if _data(h).get("status") == "supported"]
+    # Review a supported finding before optional diagnosis follow-ups. Reviewer
+    # evidence requests remain mandatory and keep their normal priority.
+    reviewer_requests = [r for r in requests if r.get("source_agent") == "review"]
+    if supported and not reviewer_requests:
+        candidates = [h for h in supported if not reviews.get((str(h.get("entry_id")), int(h.get("revision", 1))))]
+        if candidates:
+            ref = _revision_ref(sorted(candidates, key=lambda h: str(h.get("entry_id")))[0])
+            plan = _make_dispatch("review", "review_hypotheses", ref,
+                                  {"rule": "unreviewed_hypothesis_revision", "hypothesis": ref}, seen)
+            if plan:
+                return plan
+        if any(_accepted(h, reviews) for h in supported):
+            requests = []
+    if reviewer_requests:
+        requests = reviewer_requests
+    # An outstanding information request takes priority over general analysis.
+    # The specialist chooses only from its allowlisted fixture tools.
+    if requests:
+        request = requests[0]
+        request_ref = _revision_ref(request)
+        plan = _make_dispatch(
+            "evidence",
+            "collect_evidence",
+            {"problem": problem.get("problem_id"), "request": request_ref},
+            {"rule": "open_evidence_request", "request": request_ref},
+            seen,
+        )
+        if plan is not None:
+            return plan
+        # A request can be unavailable. _active_requests removes it after the
+        # linked observation records that result, so a repeated key here means
+        # the specialist ran but failed to record any outcome.
+        return TerminalPlan("unresolved", "evidence_request_not_satisfied")
 
     # Revisit diagnoses when the evidence set changes or a reviewer rejects a
     # current hypothesis. A single diagnostic pass is allowed for each semantic
@@ -326,6 +347,8 @@ def _choose_next_action(
     review_candidates = [
         h for h in fresh_hypotheses if not reviews.get((str(h.get("entry_id")), int(h.get("revision", 1))))
     ]
+    if any(_data(h).get("status") == "supported" for h in accepted_hypotheses):
+        review_candidates = []
     if review_candidates:
         hypothesis = sorted(review_candidates, key=lambda h: str(h.get("entry_id")))[0]
         ref = _revision_ref(hypothesis)

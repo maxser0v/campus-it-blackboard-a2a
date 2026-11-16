@@ -77,3 +77,12 @@ def test_registry_rejects_non_allowlisted_tools() -> None:
 def test_fixture_execution_rejects_invalid_query_arguments(tool, query) -> None:
     with pytest.raises(ValueError):
         ToolRegistry().execute(tool, case_id="db_pool", arguments=query)
+
+
+def test_query_catalog_exposes_names_without_evidence_values():
+    from campus_blackboard.tools.fixtures import read_query_catalog
+    catalog = read_query_catalog('db_pool')
+    assert 'db_pool_active_connections' in catalog['metric_names']
+    assert 'learning-portal' in catalog['services']
+    assert 'records' not in catalog
+    assert 'value' not in catalog

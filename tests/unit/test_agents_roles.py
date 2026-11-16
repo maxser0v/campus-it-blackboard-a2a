@@ -411,3 +411,21 @@ def test_review_skips_stale_first_hypothesis_for_current_context(stale_refs) -> 
     reviews = [entry for entry in board.entries if entry["knowledge_type"] == "review"]
     assert len(reviews) == 1
     assert reviews[0]["data"]["target_entry_id"] == "z-fresh"
+
+
+def test_live_initial_baseline_is_bounded_grounded_and_replayable():
+    board = FakeBlackboard('evidence', 'db_pool')
+    model = ScriptModel([])
+    model.mode = 'live'
+    runner = SpecialistRunner('evidence', blackboard=board, model=model)
+    payload = {'problem_id': 'problem-1', 'purpose': 'collect_evidence', 'dispatch_id': 'baseline'}
+    first = asyncio.run(runner.run(payload))
+    second = asyncio.run(runner.run(payload))
+    assert first['entry_ids'] == second['entry_ids']
+    assert len(board.entries) == 1
+    data = board.entries[0]['data']
+    assert {item['tool_name'] for item in data['components']} == {'query_metrics', 'query_logs', 'get_change_history'}
+    assert len(data['source_ids']) == len(data['records'])
+    assert any(row.get('name') == 'db_pool_max_connections' for row in data['records'])
+    assert any('message' in row for row in data['records'])
+    assert model.call_count == 0

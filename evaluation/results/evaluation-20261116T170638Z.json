@@ -1,0 +1,41 @@
+{
+  "created_at": "2026-11-16T17:06:38.150728+00:00",
+  "model_mode": "live",
+  "provider_model": "openai/gpt-oss-120b",
+  "repeat": 1,
+  "cases": [
+    {
+      "case_id": "db_pool",
+      "problem_id": "problem-e53da4b2e33e4c058fe0efe0e9c1e2c8",
+      "expected_ground_truth_label": "Database connection pool exhaustion",
+      "status": "unresolved",
+      "operational_failure": false,
+      "reason": "dispatch_limit_reached",
+      "elapsed_seconds": 156.236,
+      "dispatch_count": 12,
+      "entry_counts": {
+        "observations": 6,
+        "hypotheses": 3,
+        "evidence_requests": 6,
+        "reviews": 0,
+        "solutions": 0
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": false,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": false,
+        "response_reviewed_at_current_revision": false,
+        "response_evidence_references_resolve": false,
+        "response_has_runbook_reference": false,
+        "requested_evidence_was_linked": true,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "live"
+    }
+  ],
+  "interpretation": "These are measured fixture-run checks, not a statistical performance claim. Review underlying evidence manually."
+}

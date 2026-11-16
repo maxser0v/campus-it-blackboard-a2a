@@ -134,7 +134,10 @@ class OpenAICompatibleAdapter:
         }
         if self.token_limit_parameter:
             body[self.token_limit_parameter] = self.max_output_tokens
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": "campus-blackboard/0.1",
+        }
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
         request = urllib.request.Request(
@@ -148,8 +151,32 @@ class OpenAICompatibleAdapter:
 
         def send() -> tuple[str, dict[str, Any] | None]:
             try:
-                with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                    payload = json.loads(response.read().decode("utf-8"))
+                retry_deadline = time.monotonic() + 75
+                for attempt in range(5):
+                    try:
+                        with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                            payload = json.loads(response.read().decode("utf-8"))
+                        break
+                    except urllib.error.HTTPError as error:
+                        if error.code not in {400, 429} or attempt == 4:
+                            raise
+                        detail = error.read(2048).decode("utf-8", errors="replace")
+                        if error.code == 400 and 'json_validate_failed' not in detail:
+                            raise ModelAdapterError(f"model provider returned HTTP 400: {detail}") from error
+                        delay = min(2 ** (attempt + 1), 30)
+                        retry_after = error.headers.get("Retry-After") if error.headers else None
+                        try:
+                            delay = float(retry_after) if retry_after else delay
+                        except ValueError:
+                            pass
+                        match = re.search(r"try again in ([0-9.]+)(ms|s)", detail, re.I)
+                        if match:
+                            delay = max(delay, float(match[1]) / (1000 if match[2].lower() == "ms" else 1))
+                        delay = max(0.1, delay) + 0.25
+                        if time.monotonic() + delay > retry_deadline:
+                            raise ModelAdapterError(f"model provider rate limit exceeded retry budget: {detail}") from error
+                        error.close()
+                        time.sleep(delay)
             except urllib.error.HTTPError as error:
                 detail = error.read(2048).decode("utf-8", errors="replace")
                 raise ModelAdapterError(f"model provider returned HTTP {error.code}: {detail}") from error

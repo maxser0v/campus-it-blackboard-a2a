@@ -11,7 +11,8 @@ from typing import Any, Callable, Mapping
 
 from ..model_adapter import ModelAdapter, model_from_settings
 from ..tools import ToolRegistry, read_case_summary
-from ..tools.fixtures import validate_fixture_arguments
+from ..tools.fixtures import read_query_catalog, validate_fixture_arguments
+from ..tools.queries import already_observed, signature
 
 
 ROLES = frozenset({"evidence", "diagnosis", "review", "response"})
@@ -222,6 +223,8 @@ def _open_requests(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
         data = _data(entry)
         if str(data.get("status", "open")).lower() not in {"open", "pending"}:
             continue
+        if already_observed(data.get("requested_tool"), data.get("query"), entries):
+            continue
         if str(entry.get("entry_id")) in completed:
             continue
         result.append({"entry_id": str(entry.get("entry_id")), **data})
@@ -232,10 +235,7 @@ def _query_signature(tool: Any, query: Any) -> tuple[str, str] | None:
     """Return a stable signature for one fixture tool query."""
     if not isinstance(tool, str) or tool not in _FIXTURE_TOOL_NAMES or not isinstance(query, Mapping):
         return None
-    normalized = dict(query)
-    if tool == "query_metrics" and isinstance(normalized.get("metric_names"), list):
-        normalized["metric_names"] = sorted(set(normalized["metric_names"]))
-    return tool, json.dumps(normalized, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return signature(tool, dict(query))
 
 
 def _unavailable_queries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -461,6 +461,7 @@ class SpecialistRunner:
             if replay is not None:
                 return replay
         summary = read_case_summary(case_id)
+        summary["query_catalog"] = read_query_catalog(case_id)
         entries = _entries(snapshot)
 
         if purpose == "collect_evidence":
@@ -516,8 +517,21 @@ class SpecialistRunner:
             },
             "_output_schema": {"tool": "allowlisted tool name", "query": "object of that tool's permitted arguments", "rationale": "string", "fulfilled_request_entry_id": "string or null"},
         }
-        choice = await self._ask("collect_evidence", context, lambda output: _validate_tool_choice(output, open_requests))
-        tool_result = self.tools.execute(choice["tool"], case_id=case_id, arguments=choice["query"])
+        if not any(_kind(e) == "observation" for e in entries) and getattr(self.model, "mode", "") == "live":
+            # One bounded baseline, published atomically with provenance. No model
+            # guesses are needed to discover which records exist.
+            components = [self.tools.execute(tool, case_id=case_id, arguments={})
+                          for tool in ("query_metrics", "query_logs", "get_change_history")]
+            choice = {"rationale": "Collect bounded baseline metrics, recent logs, and changes before diagnosis.", "fulfilled_request_entry_id": None}
+            tool_result = {
+                "tool_name": "baseline", "query": {}, "components": components,
+                "records": [r for item in components for r in item["records"]],
+                "source_ids": [r for item in components for r in item["source_ids"]],
+                "observed_at": components[0]["observed_at"],
+            }
+        else:
+            choice = await self._ask("collect_evidence", context, lambda output: _validate_tool_choice(output, open_requests))
+            tool_result = self.tools.execute(choice["tool"], case_id=case_id, arguments=choice["query"])
         if not isinstance(tool_result, dict) or not isinstance(tool_result.get("records"), list):
             raise SpecialistRunError("fixture tool returned an invalid result object")
         request_id = choice["fulfilled_request_entry_id"]
@@ -527,6 +541,7 @@ class SpecialistRunner:
             "source_ids": tool_result["source_ids"],
             "observed_at": tool_result["observed_at"],
             "records": tool_result["records"],
+            **({"components": tool_result["components"]} if "components" in tool_result else {}),
             "rationale": choice["rationale"],
             "fulfilled_request_entry_id": request_id,
             "fulfilled_request_status": ("fulfilled" if tool_result["records"] else "unavailable") if request_id else None,
@@ -604,6 +619,8 @@ class SpecialistRunner:
                 entry_id = _result_entry_id(response, f"dispatch:{dispatch_id}:hypothesis:{index}")
             written.append(entry_id)
         for index, request in enumerate(decision["evidence_requests"]):
+            if already_observed(request.get("requested_tool"), request.get("query"), entries):
+                continue
             if _was_unavailable(request.get("requested_tool"), request.get("query"), context["unavailable_evidence_queries"]):
                 suppressed_unavailable_request = True
                 continue
@@ -747,7 +764,7 @@ class SpecialistRunner:
             actor_solutions = [entry for entry in candidates if entry.get("source_agent") == self.actor]
             if actor_solutions:
                 candidates = actor_solutions
-        return sorted(candidates, key=lambda entry: str(entry.get("entry_id")))[0] if candidates else None
+        return sorted(candidates, key=lambda entry: (_data(entry).get("status") != "supported", str(entry.get("entry_id"))))[0] if candidates else None
 
     async def _respond(self, problem_id: str, dispatch_id: str, summary: dict[str, Any], entries: list[dict[str, Any]]) -> tuple[list[str], str]:
         reviews = _latest_reviews(entries)

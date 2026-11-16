@@ -56,7 +56,7 @@ def load_case(case_id: str) -> dict[str, Any]:
     return content
 
 
-def read_case_summary(case_id: str) -> dict[str, str]:
+def read_case_summary(case_id: str) -> dict[str, Any]:
     """Return only incident metadata, never underlying metric/log/change rows."""
     case = load_case(case_id)
     return {
@@ -64,6 +64,18 @@ def read_case_summary(case_id: str) -> dict[str, str]:
         "title": str(case.get("title", "")),
         "symptoms": str(case.get("symptoms", "")),
         "observed_at": str(case.get("observed_at", "")),
+    }
+
+
+def read_query_catalog(case_id: str) -> dict[str, Any]:
+    """Expose queryable names without revealing measurements or log contents."""
+    case = load_case(case_id)
+    return {
+            "metric_names": sorted({row["name"] for row in case.get("metrics", [])}),
+            "services": sorted({row["service"] for row in case.get("logs", []) + case.get("changes", [])}),
+            "log_levels": ["debug", "info", "warning", "error", "critical"],
+            "query_rules": "Log level is one lowercase string or null, never a list or 'all'. Omit filters to read all levels. Log contains matches ALL supplied words, NOT regex or OR: do not use pipes, OR, wildcards, or combined terms. Use an empty query to discover logs before filtering. Limits are integers from 1 to 100. Metric names are a list of exact catalog names.",
+            "guidance": "Use these exact names in queries. No measurement values are included. An empty query retrieves a bounded baseline; do not guess names or overly restrict baseline logs.",
     }
 
 

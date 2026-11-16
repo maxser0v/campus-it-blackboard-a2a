@@ -56,3 +56,23 @@ The controller starts with a maximum of 12 specialist dispatches, a five-minute 
 ## Local prototype limits
 
 The service credentials and fixture dataset are intended for a classroom demonstration on one machine. This is not connected to campus infrastructure, does not execute remediation, and is not a production authorization or identity design. Model confidence is an uncalibrated self-assessment and does not participate in completion checks.
+
+### Live investigation convergence
+
+Live runs collect a bounded baseline of metrics, recent logs, and change history
+in one Evidence dispatch before asking the model to diagnose. The observation
+retains each tool result in `components` and the original source IDs; it contains
+only records returned by the tools. Offline fixture mode retains its staged
+baseline so deterministic targeted-evidence tests remain reproducible.
+
+The controller reviews a fresh supported hypothesis before optional Diagnosis
+follow-ups. Reviewer evidence requests still take priority. An accepted current
+supported hypothesis permits a response without requiring reviews of unrelated
+alternatives; the current response must still pass its own review.
+
+Query signatures normalize defaults, metric order, and the log tool's AND word
+filters. Completed equivalent queries (including baseline components) are reused
+instead of dispatched again. Unavailable equivalent requests are not retried.
+Existing semantic dispatch signatures terminate states with no eligible new work
+rather than restarting identical diagnosis/review tasks. Dispatch, deadline, and
+token limits remain in place as final bounds.
