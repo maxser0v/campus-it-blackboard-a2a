@@ -248,6 +248,8 @@ def main() -> int:
     print(f"Started {len(processes)} project processes.")
     print(f"Dashboard: http://{settings.bind_host}:{UI_PORT}")
     print(f"Controller API: http://{settings.bind_host}:{settings.controller_port}")
+    if settings.model_mode == "live":
+        print(f"Model provider: {settings.model_provider}")
     print(f"Model mode: {settings.model_mode}{' (fixture-driven, no live provider call)' if settings.model_mode == 'offline' else ''}")
     print(f"Logs and process IDs: {STATE_PATH}")
     return 0

@@ -23,8 +23,12 @@ def validate_fixture_arguments(tool: str, query: dict[str, Any]) -> None:
         "query_logs": {"contains", "service", "level", "limit"},
         "get_change_history": {"service", "limit"},
     }
-    if tool not in allowed or not isinstance(query, dict) or set(query) - allowed[tool]:
-        raise FixtureError("unsupported fixture tool or query arguments")
+    if tool not in allowed:
+        raise FixtureError(f"unsupported fixture tool {tool!r}; choose one of {sorted(allowed)}")
+    if not isinstance(query, dict):
+        raise FixtureError("fixture query must be an object")
+    if set(query) - allowed[tool]:
+        raise FixtureError(f"unsupported fixture tool or query arguments: {sorted(set(query) - allowed[tool])}; {tool} permits only {sorted(allowed[tool])}")
     for key, maximum in (("contains", 100 if tool == "query_metrics" else 200), ("service", 100)):
         value = query.get(key)
         if value is not None and (not isinstance(value, str) or len(value) > maximum):

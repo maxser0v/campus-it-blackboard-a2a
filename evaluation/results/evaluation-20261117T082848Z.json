@@ -1,0 +1,45 @@
+{
+  "created_at": "2026-11-17T08:28:48.488243+00:00",
+  "model_mode": "live",
+  "model_provider": "codex_cli",
+  "provider_model": "gpt-6-luna",
+  "repeat": 1,
+  "cases": [
+    {
+      "case_id": "missing_evidence",
+      "problem_id": "problem-c069d734c88d42399eaa73a912503cb5",
+      "expected_ground_truth_label": "Insufficient evidence to identify a root cause",
+      "status": "unresolved",
+      "operational_failure": false,
+      "reason": "repeated_queries_returned_no_evidence",
+      "elapsed_seconds": 54.751,
+      "dispatch_count": 6,
+      "entry_counts": {
+        "observations": 3,
+        "hypotheses": 2,
+        "evidence_requests": 3,
+        "reviews": 0,
+        "solutions": 0
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": true,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": false,
+        "response_reviewed_at_current_revision": false,
+        "response_evidence_references_resolve": false,
+        "response_has_runbook_reference": false,
+        "requested_evidence_was_linked": false,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false,
+        "missing_evidence_unavailable_request_recorded": true,
+        "missing_evidence_stopped_for_evidence_reason": true,
+        "missing_evidence_ends_without_accepted_cause": true
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "live"
+    }
+  ],
+  "interpretation": "These are measured fixture-run checks, not a statistical performance claim. Review underlying evidence manually."
+}

@@ -21,6 +21,11 @@ class Settings:
     agent_urls: Mapping[str, str] = field(default_factory=dict)
     agent_credentials: Mapping[str, str] = field(default_factory=dict)
     model_mode: str = "offline"
+    model_provider: str = "groq"
+    codex_executable: str = "codex"
+    codex_model: str | None = None
+    codex_reasoning_effort: str | None = None
+    codex_timeout_seconds: float = 180.0
     model_base_url: str | None = None
     model_name: str | None = None
     model_api_key: str | None = None
@@ -32,6 +37,13 @@ class Settings:
     max_retries: int = 1
     max_run_tokens: int = 12000
     case_timeout_seconds: int = 300
+
+    @property
+    def specialist_timeout(self) -> float:
+        # Each specialist may make one repair call after the initial response.
+        if self.model_mode == "live" and self.model_provider == "codex_cli":
+            return max(self.request_timeout, 2 * self.codex_timeout_seconds + 30)
+        return self.request_timeout
 
     @classmethod
     def from_env(cls, *, load_dotenv_file: bool = True) -> "Settings":
@@ -63,6 +75,11 @@ class Settings:
             agent_urls=urls,
             agent_credentials=credentials,
             model_mode=os.getenv("CAMPUS_MODEL_MODE", "offline").lower(),
+            model_provider=os.getenv("CAMPUS_MODEL_PROVIDER", "groq").lower(),
+            codex_executable=os.getenv("CAMPUS_CODEX_EXECUTABLE", "codex"),
+            codex_model=_optional_env("CAMPUS_CODEX_MODEL"),
+            codex_reasoning_effort=_optional_env("CAMPUS_CODEX_REASONING_EFFORT"),
+            codex_timeout_seconds=_float_env("CAMPUS_CODEX_TIMEOUT_SECONDS", 180.0),
             model_base_url=_optional_env("CAMPUS_MODEL_BASE_URL"),
             model_name=_optional_env("CAMPUS_MODEL_NAME"),
             model_api_key=_optional_env("CAMPUS_MODEL_API_KEY"),
@@ -77,6 +94,12 @@ class Settings:
         )
 
     def __post_init__(self) -> None:
+        if self.model_provider not in {"groq", "openai_compatible", "codex_cli"}:
+            raise ValueError("model_provider must be groq, openai_compatible, or codex_cli")
+        if self.codex_reasoning_effort not in {None, "low", "medium", "high", "xhigh", "max"}:
+            raise ValueError("Codex reasoning effort must be low, medium, high, xhigh, max, or unset")
+        if not self.codex_executable.strip() or self.codex_timeout_seconds <= 0:
+            raise ValueError("Codex executable and positive timeout are required")
         if self.model_mode not in {"offline", "live"}:
             raise ValueError("model_mode must be 'offline' or 'live'")
         if self.request_timeout <= 0 or self.max_dispatches < 1 or self.max_run_tokens < 1 or self.case_timeout_seconds < 1:
@@ -89,7 +112,7 @@ class Settings:
             raise ValueError("agent credential actor names and tokens must be non-empty")
         if len(set(self.agent_credentials.values())) != len(self.agent_credentials):
             raise ValueError("each actor must have a unique A2A credential")
-        if self.model_mode == "live" and not (self.model_base_url and self.model_name):
+        if self.model_mode == "live" and self.model_provider != "codex_cli" and not (self.model_base_url and self.model_name):
             raise ValueError("live model mode requires model_base_url and model_name")
         if self.model_token_limit_parameter not in {None, "max_tokens", "max_completion_tokens"}:
             raise ValueError("model_token_limit_parameter must be max_tokens, max_completion_tokens, or unset")

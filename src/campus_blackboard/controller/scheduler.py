@@ -241,6 +241,13 @@ def _choose_next_action(
         h for h in hypotheses
         if _ref_set(_data(h).get("observation_refs")) == expected_observations
     ]
+    latest_observations = sorted(observations, key=_sort_key)[-2:]
+    if (fresh_hypotheses
+        and not any(_data(h).get("status") == "supported" for h in fresh_hypotheses)
+        and len(latest_observations) == 2
+        and all(_data(o).get("fulfilled_request_status") == "unavailable"
+                and _data(o).get("records") == [] for o in latest_observations)):
+        return TerminalPlan("unresolved", "repeated_queries_returned_no_evidence")
     accepted_hypotheses = [h for h in fresh_hypotheses if _accepted(h, reviews)]
     current_hypothesis_revisions = {
         (str(h.get("entry_id")), int(h.get("revision", 1))) for h in fresh_hypotheses

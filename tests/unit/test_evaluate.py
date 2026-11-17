@@ -126,3 +126,9 @@ def test_missing_evidence_query_defaults_are_normalized_without_losing_filters(o
     }, {})
     assert result["checks"]["missing_evidence_unavailable_request_recorded"] is expected
     assert result["checks"]["missing_evidence_ends_without_accepted_cause"] is expected
+
+
+def test_query_comparison_accepts_integral_wire_limits_but_not_fractions():
+    from scripts.evaluate import _queries_match
+    assert _queries_match('query_logs', {'service': 'lab', 'limit': 100.0}, {'service': 'lab', 'limit': 100})
+    assert not _queries_match('query_logs', {'service': 'lab', 'limit': 1.5}, {'service': 'lab', 'limit': 1})

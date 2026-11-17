@@ -105,3 +105,58 @@ The focused scheduler and workflow tests run without a model provider or network
 | Dashboard | `http://127.0.0.1:8501` |
 
 Ports, host, service URLs, database location, model mode, and limits are configurable in `.env`. A2A services publish `/.well-known/agent-card.json` and accept JSON-RPC at `/a2a/jsonrpc/`.
+
+## Choose Groq or Codex CLI
+
+Offline mode remains the default. In live mode, choose the backend with
+`CAMPUS_MODEL_PROVIDER`. Omitting it preserves the existing compatible HTTP
+adapter, including Groq. `openai_compatible` is also accepted for other compatible
+HTTP endpoints.
+
+For Groq, keep your existing provider URL, model, and key:
+
+```dotenv
+CAMPUS_MODEL_MODE=live
+CAMPUS_MODEL_PROVIDER=groq
+CAMPUS_MODEL_BASE_URL=https://api.groq.com/openai/v1
+CAMPUS_MODEL_NAME=openai/gpt-oss-120b
+CAMPUS_MODEL_API_KEY=your-local-groq-key
+CAMPUS_MODEL_TOKEN_LIMIT_PARAMETER=max_completion_tokens
+```
+
+For Codex CLI, install a current CLI and sign in with `codex login` first.
+Check access with `codex login status`. The adapter was verified with CLI 0.147.0 and 0.169.0. GPT-6 Luna with high reasoning effort was verified using 0.169.0; the older CLI rejected that model.
+Set:
+
+```dotenv
+CAMPUS_MODEL_MODE=live
+CAMPUS_MODEL_PROVIDER=codex_cli
+CAMPUS_CODEX_EXECUTABLE=codex
+CAMPUS_CODEX_MODEL=
+CAMPUS_CODEX_REASONING_EFFORT=
+CAMPUS_CODEX_TIMEOUT_SECONDS=180
+```
+
+A blank `CAMPUS_CODEX_MODEL` uses the CLI's built-in default; set it to a model
+available to your Codex account to override it. This setting is separate from
+`CAMPUS_MODEL_NAME`, so an existing Groq model identifier is never sent to Codex.
+Set `CAMPUS_CODEX_REASONING_EFFORT=high` for high reasoning effort (or leave it blank for the model default). This selects reasoning depth, not an account usage allowance.
+The HTTP URL and Groq key are unused by Codex. Existing file/keychain Codex login
+is used; this adapter does not forward API-key environment variables.
+
+Restart with `scripts/stop.py` followed by `scripts/start.py` after changing the
+provider. The dashboard shows the active provider and model. Evaluation still
+requires `--allow-live` for either provider, and records which provider was used.
+
+Each Codex request runs non-interactively from a temporary folder, in read-only
+mode, without loading your user configuration or project files. Shell execution,
+plugins, browser/computer use, hooks, and delegation are disabled. A strict JSON
+envelope carries the specialist result, which is then checked by the existing
+role validators. Failed CLI calls and timeouts are surfaced, with no fabricated
+answer or silent fallback to Groq. Reported token usage is recorded; missing
+usage remains unmeasured. Codex has its own account usage limits and typically
+more prompt overhead than a direct HTTP model call. Adjust `CAMPUS_MAX_RUN_TOKENS`
+and `CAMPUS_CASE_TIMEOUT_SECONDS` if needed for your selected model; the defaults
+remain unchanged. The controller allows enough time for two CLI calls (initial
+response plus one repair), while the investigation deadline remains a separate
+bound checked between tasks.

@@ -114,9 +114,21 @@ def _has_grounding(claim: str, cited_observations: list[Mapping[str, Any]]) -> b
         return False
     corpus_tokens = _meaningful_tokens(normalized_corpus)
     topic = next((expected for claim_terms, expected in signal_groups if tokens & claim_terms), None)
+    # Generic HTTP errors, latency and request rates describe symptoms. They
+    # cannot establish which dependency failed or why it failed.
+    records = [row for entry in cited_observations for row in _data(entry).get("records", []) if isinstance(row, Mapping)]
+    if tokens & {"upstream", "downstream", "dependency", "network"}:
+        identified = any(
+            isinstance(row.get("fields"), Mapping)
+            and any(row["fields"].get(key) for key in ("dependency", "upstream_service", "upstream_host", "cause", "root_cause"))
+            for row in records
+        )
+        if not identified:
+            return False
     if topic is not None:
         return bool(corpus_tokens & topic)
-    overlap = tokens & corpus_tokens
+    symptom_terms = {"latency", "error", "failed", "failure", "upstream", "downstream", "dependency", "intermittent", "elevated", "high", "request", "rate", "response", "502", "causing", "cause", "slow", "service"}
+    overlap = (tokens & corpus_tokens) - symptom_terms
     return len(overlap) >= min(2, max(1, len(tokens) // 3))
 
 
@@ -131,10 +143,6 @@ def _validate_tool_choice(output: Any, open_requests: list[dict[str, Any]]) -> d
     if not isinstance(rationale, str) or not rationale.strip():
         raise ValueError("rationale must be a non-empty string")
     validate_fixture_arguments(tool, query)
-    if tool == "query_metrics" and not query.get("metric_names") and not query.get("contains"):
-        raise ValueError("query_metrics needs metric_names or contains")
-    if tool == "query_logs" and not any(query.get(key) for key in ("contains", "service", "level")):
-        raise ValueError("query_logs requires a filter")
     if open_requests:
         request_id = output.get("fulfilled_request_entry_id")
         selected = next((item for item in open_requests if item.get("entry_id") == request_id), None)
@@ -192,7 +200,7 @@ def _validate_diagnosis(output: Any, entries: list[dict[str, Any]], actor: str) 
         if status == "supported":
             cited = [observations[str(ref)] for ref in supporting]
             if not cited or not _has_grounding(claim, cited):
-                raise ValueError("supported hypothesis requires non-empty, claim-relevant observation records")
+                raise ValueError("supported hypothesis requires non-empty, claim-relevant, cause-specific observation records; generic latency, error rates and HTTP 502/upstream errors alone do not identify a root cause")
         revise_id = item.get("revise_entry_id")
         if revise_id is not None:
             prior = own_hypotheses.get(str(revise_id))
@@ -405,6 +413,12 @@ class SpecialistRunner:
     async def _ask(self, purpose: str, context: dict[str, Any], validator: Callable[[Any], Any]) -> Any:
         instructions = _prompt(self.role)
         schema = context.pop("_output_schema")
+        context["available_tools"] = {
+            "query_metrics": {"metric_names": "optional list of exact metric names", "contains": "optional string or null"},
+            "query_logs": {"contains": "optional string matching ALL words", "service": "optional exact service name", "level": "optional single lowercase debug/info/warning/error/critical or null", "limit": "optional integer 1..100"},
+            "get_change_history": {"service": "optional exact service name", "limit": "optional integer 1..100"},
+        }
+        context["tool_query_rules"] = "Only listed argument keys are allowed. query_metrics does NOT accept service, limit, time ranges, or filters. There are no DNS lookup or infrastructure tools. An evidence request must use requested_tool and query, not tool or arguments. Request unavailable evidence using a valid query; do not invent a tool."
         attempts: list[dict[str, Any]] = []
         for attempt in range(2):
             request_context = context if attempt == 0 else {
@@ -517,7 +531,7 @@ class SpecialistRunner:
             },
             "_output_schema": {"tool": "allowlisted tool name", "query": "object of that tool's permitted arguments", "rationale": "string", "fulfilled_request_entry_id": "string or null"},
         }
-        if not any(_kind(e) == "observation" for e in entries) and getattr(self.model, "mode", "") == "live":
+        if not open_requests and not any(_kind(e) == "observation" for e in entries) and getattr(self.model, "mode", "") == "live":
             # One bounded baseline, published atomically with provenance. No model
             # guesses are needed to discover which records exist.
             components = [self.tools.execute(tool, case_id=case_id, arguments={})
@@ -530,7 +544,18 @@ class SpecialistRunner:
                 "observed_at": components[0]["observed_at"],
             }
         else:
-            choice = await self._ask("collect_evidence", context, lambda output: _validate_tool_choice(output, open_requests))
+            if open_requests and getattr(self.model, "mode", "") == "live":
+                # An approved exact query is execution work, not another model
+                # decision. Preserve the request rather than asking an LLM to copy it.
+                reviewer_ids = {str(e.get("entry_id")) for e in entries if e.get("source_agent") == "review"}
+                selected = next((r for r in open_requests if r["entry_id"] in reviewer_ids), open_requests[0])
+                query = dict(selected["query"])
+                if isinstance(query.get("limit"), float) and query["limit"].is_integer():
+                    query["limit"] = int(query["limit"])
+                choice = _validate_tool_choice({"tool": selected["requested_tool"], "query": query,
+                    "rationale": selected["reason"], "fulfilled_request_entry_id": selected["entry_id"]}, open_requests)
+            else:
+                choice = await self._ask("collect_evidence", context, lambda output: _validate_tool_choice(output, open_requests))
             tool_result = self.tools.execute(choice["tool"], case_id=case_id, arguments=choice["query"])
         if not isinstance(tool_result, dict) or not isinstance(tool_result.get("records"), list):
             raise SpecialistRunError("fixture tool returned an invalid result object")
@@ -680,7 +705,7 @@ class SpecialistRunner:
             query = f"{solution_data.get('summary', '')} " + " ".join(
                 str(action.get("step", "")) for action in solution_data.get("actions", []) if isinstance(action, Mapping)
             )
-            result = self.tools.execute("search_runbooks", arguments={"query": query, "limit": 10})
+            result = self.tools.execute("search_runbooks", arguments={"query": query[:500], "limit": 10})
             retrieved = result.get("results", [])
         retrieved_ids = {str(item.get("section_id")) for item in retrieved}
         context = {
@@ -696,7 +721,7 @@ class SpecialistRunner:
             "_output_schema": {
                 "target_entry_id": "exact target entry ID", "target_revision": "exact target revision",
                 "verdict": sorted(_REVIEW_VERDICTS), "rationale": "string",
-                "supporting_evidence_ids": [], "required_follow_up": "null or {question, requested_tool, query, reason}",
+                "supporting_evidence_ids": [], "required_follow_up": {"question": "nonempty string", "requested_tool": sorted(_FIXTURE_TOOL_NAMES), "query": "object containing ONLY arguments listed in available_tools for the selected tool", "reason": "nonempty string"},
             },
         }
         review = await self._ask(purpose, context, lambda output: _validate_review(output, target, entries, purpose, retrieved_ids))
@@ -780,7 +805,7 @@ class SpecialistRunner:
             raise SpecialistRunError("response task requires a currently accepted supported hypothesis")
         refs = [_ref(entry) for entry in sorted(viable, key=lambda item: str(item.get("entry_id")))]
         claims = [str(_data(entry).get("claim", "")) for entry in viable]
-        runbook_result = self.tools.execute("search_runbooks", arguments={"query": " ".join(claims), "limit": 10})
+        runbook_result = self.tools.execute("search_runbooks", arguments={"query": " ".join(claims)[:500], "limit": 10})
         runbooks = runbook_result.get("results", [])
         runbook_ids = {str(item.get("section_id")) for item in runbooks}
         if not runbooks:

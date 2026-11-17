@@ -1,0 +1,42 @@
+{
+  "created_at": "2026-11-17T07:57:35.266639+00:00",
+  "model_mode": "live",
+  "model_provider": "codex_cli",
+  "provider_model": "codex-default",
+  "repeat": 1,
+  "cases": [
+    {
+      "case_id": "db_pool",
+      "problem_id": "problem-879623a8436243d19801a0d0149d5b63",
+      "expected_ground_truth_label": "Database connection pool exhaustion",
+      "status": "completed",
+      "operational_failure": false,
+      "reason": "current_supported_diagnosis_and_solution_accepted",
+      "elapsed_seconds": 50.024,
+      "dispatch_count": 5,
+      "entry_counts": {
+        "observations": 1,
+        "hypotheses": 3,
+        "evidence_requests": 0,
+        "reviews": 2,
+        "solutions": 1
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": true,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": true,
+        "response_reviewed_at_current_revision": true,
+        "response_evidence_references_resolve": true,
+        "response_has_runbook_reference": true,
+        "requested_evidence_was_linked": false,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "live"
+    }
+  ],
+  "interpretation": "These are measured fixture-run checks, not a statistical performance claim. Review underlying evidence manually."
+}

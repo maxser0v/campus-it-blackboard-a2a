@@ -429,3 +429,62 @@ def test_live_initial_baseline_is_bounded_grounded_and_replayable():
     assert any(row.get('name') == 'db_pool_max_connections' for row in data['records'])
     assert any('message' in row for row in data['records'])
     assert model.call_count == 0
+
+
+def test_generic_upstream_errors_do_not_establish_a_cause():
+    obs = _entry('obs', 'observation', {'records': [
+        {'name': 'request_latency_p95_ms', 'value': 720},
+        {'message': 'Request failed with an upstream error', 'fields': {'status': 502}},
+    ]}, source='evidence')
+    claim = 'Intermittent upstream dependency failures are causing 502 errors, elevated error rate, and high latency.'
+    with pytest.raises(ValueError, match='cause-specific'):
+        _validate_diagnosis({'hypotheses': [{'claim': claim, 'status': 'supported', 'supporting_evidence_ids': ['obs']}], 'evidence_requests': []}, [obs], 'diagnosis')
+    target = _entry('hyp', 'hypothesis', {'claim': claim, 'status': 'supported', 'supporting_evidence_ids': ['obs']})
+    with pytest.raises(ValueError, match='cannot accept'):
+        _validate_review({'target_entry_id': 'hyp', 'target_revision': 1, 'verdict': 'accept', 'rationale': '502 indicates dependency failure', 'supporting_evidence_ids': ['obs'], 'required_follow_up': None}, target, [obs], 'review_hypotheses', set())
+
+
+def test_reviewer_receives_tool_contract_and_repairs_invalid_arguments():
+    class RepairModel(ScriptModel):
+        async def complete(self, **kwargs):
+            assert 'service' not in kwargs['context']['available_tools']['query_metrics']
+            if self.call_count:
+                assert 'permits only' in kwargs['context']['repair_feedback']['validation_error']
+            return await super().complete(**kwargs)
+    obs = _entry('obs', 'observation', {'records': [{'name': 'request_latency_p95_ms', 'value': 720}]}, source='evidence')
+    hyp = _entry('hyp', 'hypothesis', {'claim': 'Database pool issue', 'status': 'proposed', 'supporting_evidence_ids': [], 'observation_refs': [{'entry_id': 'obs', 'revision': 1}]})
+    base = {'target_entry_id': 'hyp', 'target_revision': 1, 'verdict': 'request_evidence', 'rationale': 'Need direct measurements', 'supporting_evidence_ids': ['obs']}
+    follow = {'question': 'Pool occupancy?', 'requested_tool': 'query_metrics', 'reason': 'Distinguish a cause', 'query': {'service': 'lab', 'metric_names': ['db_pool_active_connections']}}
+    model = RepairModel([{**base, 'required_follow_up': follow}, {**base, 'required_follow_up': {**follow, 'query': {'metric_names': ['db_pool_active_connections']}}}])
+    board = FakeBlackboard('review', 'missing_evidence', [obs, hyp])
+    result = asyncio.run(SpecialistRunner('review', blackboard=board, model=model).run({'problem_id': 'problem-1', 'purpose': 'review_hypotheses', 'dispatch_id': 'repair'}))
+    assert result['ok']
+    assert model.call_count == 2
+    request = next(e for e in board.entries if e['knowledge_type'] == 'evidence_request')
+    assert 'service' not in request['data']['query']
+
+
+def test_solution_review_bounds_derived_runbook_query():
+    target = _entry('solution', 'solution', {
+        'summary': 'Campus DNS resolution failure. ' * 30,
+        'actions': [{'step': 'Check resolver configuration ' * 30, 'purpose': 'Diagnose', 'expected_check': 'Resolution recovers'}],
+        'evidence_ids': [], 'runbook_ids': [],
+    }, source='response')
+    board = FakeBlackboard('review', 'dns_fault', [target])
+    model = ScriptModel([{'target_entry_id': 'solution', 'target_revision': 1, 'verdict': 'reject', 'rationale': 'Missing supporting observations', 'supporting_evidence_ids': [], 'required_follow_up': None}])
+    result = asyncio.run(SpecialistRunner('review', blackboard=board, model=model).run({'problem_id': 'problem-1', 'purpose': 'review_solution', 'dispatch_id': 'long-runbook-query'}))
+    assert result['ok']
+    assert model.call_count == 1
+
+
+def test_live_evidence_executes_approved_request_without_model_copying_it():
+    board = FakeBlackboard('evidence', 'missing_evidence', [
+        _entry('request', 'evidence_request', {'question': 'Dependency metric?', 'requested_tool': 'query_metrics', 'query': {'metric_names': ['upstream_dependency_errors']}, 'reason': 'Need causal evidence', 'status': 'open'}, source='review'),
+    ])
+    model = ScriptModel([])
+    model.mode = 'live'
+    result = asyncio.run(SpecialistRunner('evidence', blackboard=board, model=model).run({'problem_id': 'problem-1', 'purpose': 'collect_evidence', 'dispatch_id': 'exact-request'}))
+    assert result['ok']
+    assert model.call_count == 0
+    assert board.entries[-1]['data']['fulfilled_request_entry_id'] == 'request'
+    assert board.entries[-1]['data']['fulfilled_request_status'] == 'unavailable'

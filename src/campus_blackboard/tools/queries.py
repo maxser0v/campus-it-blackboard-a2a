@@ -33,4 +33,21 @@ def already_observed(tool, query, entries):
     key = signature(tool, query)
     if key is None:
         return False
-    return any(signature(item.get('tool_name'), item.get('query')) == key for item in evidence_queries(entries))
+    for item in evidence_queries(entries):
+        if signature(item.get('tool_name'), item.get('query')) == key:
+            return True
+        # A complete bounded unfiltered result can answer a narrower query on
+        # these immutable fixtures. Never infer that a truncated result is complete.
+        if item.get('tool_name') != tool:
+            continue
+        prior = item.get('query', {})
+        records = item.get('records', [])
+        if tool == 'query_metrics' and not prior.get('metric_names') and not prior.get('contains'):
+            names = query.get('metric_names') or []
+            if names and set(names) <= {r.get('name') for r in records}:
+                return True
+        if tool in {'query_logs', 'get_change_history'}:
+            filters = ('service', 'contains', 'level') if tool == 'query_logs' else ('service',)
+            if not any(prior.get(k) for k in filters) and len(records) < prior.get('limit', 20) and query.get('limit', 20) <= prior.get('limit', 20):
+                return True
+    return False

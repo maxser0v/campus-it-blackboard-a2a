@@ -381,6 +381,17 @@ def model_from_settings(settings: Any | None = None) -> ModelAdapter:
         return OfflineFixtureAdapter()
     if mode != "live":
         raise ValueError("model_mode must be 'offline' or 'live'")
+    provider = getattr(settings, "model_provider", "groq")
+    if provider == "codex_cli":
+        from .codex_adapter import CodexCLIAdapter
+        return CodexCLIAdapter(
+            executable=getattr(settings, "codex_executable", "codex"),
+            model=getattr(settings, "codex_model", None),
+            reasoning_effort=getattr(settings, "codex_reasoning_effort", None),
+            timeout=getattr(settings, "codex_timeout_seconds", 180.0),
+        )
+    if provider not in {"groq", "openai_compatible"}:
+        raise ValueError("unsupported model provider")
     base_url = getattr(settings, "model_base_url", None) or os.getenv("MODEL_BASE_URL")
     model = getattr(settings, "model_name", None) or os.getenv("MODEL_NAME")
     api_key = getattr(settings, "model_api_key", None) or os.getenv("MODEL_API_KEY")

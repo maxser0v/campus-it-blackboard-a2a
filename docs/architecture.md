@@ -76,3 +76,12 @@ instead of dispatched again. Unavailable equivalent requests are not retried.
 Existing semantic dispatch signatures terminate states with no eligible new work
 rather than restarting identical diagnosis/review tasks. Dispatch, deadline, and
 token limits remain in place as final bounds.
+
+When the two latest requested observations both report unavailable evidence with
+empty records, and a fresh diagnosis has considered the entire current evidence
+set without finding a supported hypothesis, the controller ends unresolved with
+`repeated_queries_returned_no_evidence`. It does not stop before that diagnostic
+pass or override a supported finding. This bounded no-progress rule avoids
+spending the entire dispatch allowance on different empty queries. The evaluator
+recognizes this explicit insufficient-evidence outcome and normalizes integral
+query limits received as floating-point numbers over A2A before comparing them.

@@ -251,3 +251,18 @@ def test_accepted_supported_diagnosis_reaches_response_without_optional_work():
     result = choose_next_action(snapshot(obs, hyp, alternative, review, request))
     assert isinstance(result, DispatchPlan)
     assert result.role == 'response'
+
+
+def test_two_empty_attempts_stop_only_after_diagnosis_considers_them():
+    first = entry('empty-1', 'observation', {'records': [], 'fulfilled_request_status': 'unavailable'}, created_at='2026-11-06T00:00:01Z')
+    second = entry('empty-2', 'observation', {'records': [], 'fulfilled_request_status': 'unavailable'}, created_at='2026-11-06T00:00:02Z')
+    refs = [{'entry_id': 'empty-1', 'revision': 1}, {'entry_id': 'empty-2', 'revision': 1}]
+    hyp = entry('hyp', 'hypothesis', {'status': 'unresolved', 'observation_refs': refs})
+    result = choose_next_action(snapshot(first, second, hyp))
+    assert isinstance(result, TerminalPlan)
+    assert result.reason == 'repeated_queries_returned_no_evidence'
+    hyp['data']['observation_refs'] = refs[:1]
+    assert isinstance(choose_next_action(snapshot(first, second, hyp)), DispatchPlan)
+    hyp['data']['observation_refs'] = refs
+    hyp['data']['status'] = 'supported'
+    assert isinstance(choose_next_action(snapshot(first, second, hyp)), DispatchPlan)

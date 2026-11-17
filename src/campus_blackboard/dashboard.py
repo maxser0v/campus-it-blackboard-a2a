@@ -241,7 +241,10 @@ def main() -> None:
     if settings.model_mode == "offline":
         st.info("Offline model mode · agent responses are fixture-driven and do not call a live model provider.")
     else:
-        st.info(f"Live model mode · configured model: {settings.model_name or 'provider default'}")
+        model_label = settings.codex_model or "Codex default" if settings.model_provider == "codex_cli" else settings.model_name or "provider default"
+        if settings.model_provider == "codex_cli" and settings.codex_reasoning_effort:
+            model_label += f" · reasoning: {settings.codex_reasoning_effort}"
+        st.info(f"Live model mode · provider: {settings.model_provider} · configured model: {model_label}")
 
     try:
         _get("/health")

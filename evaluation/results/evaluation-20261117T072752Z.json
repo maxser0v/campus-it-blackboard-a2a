@@ -1,0 +1,76 @@
+{
+  "created_at": "2026-11-17T07:27:52.086006+00:00",
+  "model_mode": "live",
+  "provider_model": "openai/gpt-oss-120b",
+  "repeat": 1,
+  "cases": [
+    {
+      "case_id": "dns_fault",
+      "problem_id": "problem-4a5f514095fb4cc19b3b886b01a83805",
+      "expected_ground_truth_label": "Campus DNS record resolution fault",
+      "status": "blocked",
+      "operational_failure": true,
+      "reason": "specialist_or_transport_failure",
+      "elapsed_seconds": 183.179,
+      "dispatch_count": 10,
+      "entry_counts": {
+        "observations": 3,
+        "hypotheses": 3,
+        "evidence_requests": 3,
+        "reviews": 2,
+        "solutions": 1
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": false,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": true,
+        "response_reviewed_at_current_revision": false,
+        "response_evidence_references_resolve": true,
+        "response_has_runbook_reference": true,
+        "requested_evidence_was_linked": true,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "live"
+    },
+    {
+      "case_id": "missing_evidence",
+      "problem_id": "problem-65366aa1222c495683ebfae4c66c39f2",
+      "expected_ground_truth_label": "Insufficient evidence to identify a root cause",
+      "status": "blocked",
+      "operational_failure": true,
+      "reason": "specialist_or_transport_failure",
+      "elapsed_seconds": 127.122,
+      "dispatch_count": 5,
+      "entry_counts": {
+        "observations": 1,
+        "hypotheses": 3,
+        "evidence_requests": 1,
+        "reviews": 1,
+        "solutions": 1
+      },
+      "checks": {
+        "terminal_status_matches_case_expectation": false,
+        "hypothesis_evidence_references_resolve": true,
+        "current_supported_hypothesis_is_accepted": true,
+        "response_reviewed_at_current_revision": false,
+        "response_evidence_references_resolve": true,
+        "response_has_runbook_reference": true,
+        "requested_evidence_was_linked": false,
+        "dispatch_limit_respected": true,
+        "ground_truth_label_appears_in_hypothesis": false,
+        "missing_evidence_unavailable_request_recorded": false,
+        "missing_evidence_stopped_for_evidence_reason": false,
+        "missing_evidence_ends_without_accepted_cause": false
+      },
+      "manual_review_required": true,
+      "note": "Label matching is a rough signal; inspect each cited record and claim manually.",
+      "repetition": 1,
+      "model_mode": "live"
+    }
+  ],
+  "interpretation": "These are measured fixture-run checks, not a statistical performance claim. Review underlying evidence manually."
+}

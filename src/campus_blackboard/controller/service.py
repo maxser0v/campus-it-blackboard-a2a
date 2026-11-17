@@ -63,7 +63,7 @@ def create_controller_app(
         f"http://{settings.bind_host}:{settings.blackboard_port}",
         actor="controller",
         api_key=settings.agent_credentials.get("controller"),
-        timeout=settings.request_timeout,
+        timeout=settings.specialist_timeout,
     )
     app = FastAPI(title="Campus Blackboard Controller", version="0.1.0")
     app.state.settings = settings
@@ -81,7 +81,7 @@ def create_controller_app(
             payload,
             actor="controller",
             api_key=settings.agent_credentials.get("controller"),
-            timeout=settings.request_timeout,
+            timeout=settings.specialist_timeout,
         )
 
     runner = ControllerRunner(

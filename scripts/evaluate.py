@@ -38,6 +38,12 @@ def _queries_match(tool: Any, first: Any, second: Any) -> bool:
     """Compare validated arguments with the fixture tools' explicit defaults."""
     if not isinstance(tool, str) or not isinstance(first, dict) or not isinstance(second, dict):
         return False
+    # A2A Struct represents numeric fields as floats on the wire. Restore
+    # integral limits before validating query meaning; reject fractional limits.
+    first, second = dict(first), dict(second)
+    for query in (first, second):
+        if isinstance(query.get("limit"), float) and query["limit"].is_integer():
+            query["limit"] = int(query["limit"])
     try:
         validate_fixture_arguments(tool, first)
         validate_fixture_arguments(tool, second)
@@ -163,6 +169,7 @@ def assess(
             "no_supported_reviewed_hypothesis",
             "evidence_request_not_satisfied",
             "no_eligible_action",
+            "repeated_queries_returned_no_evidence",
         }
         checks["missing_evidence_unavailable_request_recorded"] = unavailable_request_observed
         checks["missing_evidence_stopped_for_evidence_reason"] = evidence_stop_reason
@@ -297,7 +304,8 @@ async def evaluate(args: argparse.Namespace) -> dict[str, Any]:
     result = {
         "created_at": datetime.now(timezone.utc).isoformat(),
         "model_mode": settings.model_mode,
-        "provider_model": settings.model_name if settings.model_mode == "live" else None,
+        "model_provider": settings.model_provider if settings.model_mode == "live" else None,
+        "provider_model": (settings.codex_model or "codex-default" if settings.model_provider == "codex_cli" else settings.model_name) if settings.model_mode == "live" else None,
         "repeat": args.repeat,
         "cases": measurements,
         "interpretation": "These are measured fixture-run checks, not a statistical performance claim. Review underlying evidence manually.",
