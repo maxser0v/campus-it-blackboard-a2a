@@ -15,6 +15,14 @@ Use the live `db_pool` case in the Streamlit dashboard. Keep the case marked **O
 | 9:30–10:30 | Explain what the evaluation script measures: statuses, dispatches, entry counts, evidence references, review gates, and case-specific checks. Distinguish automated checks from manual claim review. |
 | 10:30–11:00 | Summarize the value of conditional coordination, the synthetic-data limitation, and each member’s actual contribution. Leave time for questions. |
 
+## Agent theatre walkthrough
+
+After starting an investigation, open **Agent theatre**. The four robot cards represent Evidence, Diagnosis, Review, and Response. The active specialist glows and shows working dots; animated paths represent assignments and findings exchanged through the shared Blackboard.
+
+Use **Live** to follow the current board. For a fast or finished investigation, press **Replay** to start from the first recorded event, pause to explain a finding, use the arrows or timeline to select an event, and choose Slow, Normal, or Fast pacing. Replay does not start tasks or call a model. Its event position and playback controls persist across automatic dashboard updates.
+
+The event panel shows recorded task purposes, public findings, completion summaries, and failures. The three thinking indicators illustrate workflow stages; they do not expose private model reasoning. Specialists communicate through shared findings, and the controller schedules one specialist task at a time.
+
 ## If a service is slow or unavailable
 
 Use the dashboard’s current board state and point out whether the controller reports `blocked` for an operational failure or `unresolved` because the evidence was insufficient. If a recorded screenshot or run is used, label it as recorded. Do not imply that recorded state is a live run.

@@ -1,0 +1,29 @@
+{
+  "mode": "offline",
+  "automated_tests": {
+    "passed": 143,
+    "failed": 0
+  },
+  "browser_verified": [
+    "start investigation",
+    "live task indicator",
+    "live completion",
+    "specialist timeout and blocked state",
+    "tab stays selected on terminal transition",
+    "replay",
+    "pause",
+    "timeline scrub",
+    "previous and next",
+    "speed selection",
+    "replay stops at end",
+    "replay persists through automatic refresh",
+    "replay persists through tab navigation",
+    "message packet changes position"
+  ],
+  "fixed": [
+    "Terminal notices shifted the tab container and reset the selected tab. Reserved a stable notice slot and added a regression test."
+  ],
+  "browser_console_errors": [],
+  "scope": "Isolated local services and database. No live model-provider calls.",
+  "screenshot": "output/agent-theatre-verified.jpg"
+}

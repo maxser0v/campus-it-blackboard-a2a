@@ -8,6 +8,9 @@ from typing import Any
 
 import httpx
 import streamlit as st
+import streamlit.components.v1 as components
+
+from campus_blackboard.agent_theatre import theatre_html
 
 from campus_blackboard.config import get_settings
 from campus_blackboard.blackboard.client import BlackboardClient
@@ -96,12 +99,14 @@ def _render_board(problem_id: str) -> None:
     col_revision.metric("Blackboard revision", problem.get("board_revision", "—"))
     result = status.get("result") or {}
     col_runtime.metric("Specialist dispatches", result.get("dispatch_count", "in progress"))
+    # Keep the tab container at a stable position when terminal notices appear.
+    notice = st.empty()
     if status.get("status") == "blocked":
-        st.error(f"The investigation stopped because of an operational failure: {(result or {}).get('error') or (result or {}).get('reason', 'unknown error')}.")
+        notice.error(f"The investigation stopped because of an operational failure: {(result or {}).get('error') or (result or {}).get('reason', 'unknown error')}.")
     elif status.get("status") == "unresolved":
-        st.warning(f"The evidence did not support a completed response. Reason: {(result or {}).get('reason', 'unresolved')}.")
+        notice.warning(f"The evidence did not support a completed response. Reason: {(result or {}).get('reason', 'unresolved')}.")
     elif status.get("status") == "completed":
-        st.success("The current diagnosis and response proposal passed review. No remediation was executed.")
+        notice.success("The current diagnosis and response proposal passed review. No remediation was executed.")
 
     observations = [e for e in entries if e.get("knowledge_type") == "observation"]
     hypotheses = [e for e in entries if e.get("knowledge_type") == "hypothesis"]
@@ -109,7 +114,7 @@ def _render_board(problem_id: str) -> None:
     solutions = [e for e in entries if e.get("knowledge_type") == "solution"]
     decisions = [e for e in history if e.get("knowledge_type") == "controller_decision"]
 
-    tabs = st.tabs(["Observations", "Hypotheses", "Activity", "Controller decisions", "Response"])
+    tabs = st.tabs(["Observations", "Hypotheses", "Activity", "Controller decisions", "Response", "Agent theatre"])
     with tabs[0]:
         if not observations:
             st.info("The Evidence Agent has not added observations yet.")
@@ -232,6 +237,13 @@ def _render_board(problem_id: str) -> None:
             for caveat in data.get("caveats", []):
                 st.warning(str(caveat))
             st.caption("This is a recommendation only; the prototype does not change campus systems.")
+
+    with tabs[5]:
+        theatre = theatre_html(board, status, problem_id)
+        if hasattr(st, "iframe"):
+            st.iframe(theatre, height=850, alt="Animated specialist workflow and event replay")
+        else:
+            components.html(theatre, height=850, scrolling=True)
 
 
 def main() -> None:

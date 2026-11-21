@@ -2,7 +2,7 @@
 
 A local multi-agent prototype that investigates synthetic campus IT incidents. Evidence, Diagnosis, Review, and Response specialists communicate over A2A and share versioned findings in a persistent Blackboard. A deterministic controller schedules work from current evidence requests, entry revisions, and review results.
 
-The dashboard displays activity and evidence as it arrives. The system recommends diagnostic or recovery steps; it does not connect to campus infrastructure or execute remediation.
+The dashboard displays activity and evidence as it arrives. Its **Agent theatre** tab visualizes the four robot specialists, task activity, and Blackboard exchanges, with live and recorded replay controls for demonstrations. The system recommends diagnostic or recovery steps; it does not connect to campus infrastructure or execute remediation.
 
 ## What is included
 
