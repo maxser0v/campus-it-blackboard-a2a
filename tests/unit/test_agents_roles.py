@@ -10,9 +10,8 @@ from campus_blackboard.agents.runner import (
     SpecialistRunError,
     SpecialistRunner,
     build_specialist_handler,
-    _validate_diagnosis,
-    _validate_review,
 )
+from campus_blackboard.agents.validation import validate_diagnosis, validate_review
 from campus_blackboard.model_adapter import OfflineFixtureAdapter
 
 
@@ -145,7 +144,7 @@ def test_diagnosis_can_request_new_query_after_different_query_was_unavailable()
 def test_external_diagnosis_validation_rejects_supported_claim_with_irrelevant_records() -> None:
     obs = _entry("obs-latency", "observation", {"records": [{"name": "request_latency_p95_ms", "value": 800}]}, source="evidence")
     with pytest.raises(ValueError, match="claim-relevant"):
-        _validate_diagnosis({"hypotheses": [{"claim": "Database connection pool exhaustion", "status": "supported", "supporting_evidence_ids": ["obs-latency"], "contradicting_evidence_ids": [], "open_questions": []}], "evidence_requests": []}, [obs], "diagnosis")
+        validate_diagnosis({"hypotheses": [{"claim": "Database connection pool exhaustion", "status": "supported", "supporting_evidence_ids": ["obs-latency"], "contradicting_evidence_ids": [], "open_questions": []}], "evidence_requests": []}, [obs], "diagnosis")
 
 
 def test_offline_review_checks_raw_content_not_only_citation_ids() -> None:
@@ -228,7 +227,7 @@ def test_live_review_validation_rejects_unrelated_observation_as_support() -> No
     target = _entry("hyp-1", "hypothesis", {"claim": "Database connection pool exhaustion", "status": "supported", "supporting_evidence_ids": ["obs-latency"]}, revision=1)
     output = {"target_entry_id": "hyp-1", "target_revision": 1, "verdict": "accept", "rationale": "IDs exist", "supporting_evidence_ids": ["obs-latency"], "required_follow_up": None}
     with pytest.raises(ValueError, match="relevant"):
-        _validate_review(output, target, [obs, target], "review_hypotheses", set())
+        validate_review(output, target, [obs, target], "review_hypotheses", set())
 
 
 def test_invalid_model_output_gets_one_repair_then_explicit_error() -> None:
@@ -438,10 +437,10 @@ def test_generic_upstream_errors_do_not_establish_a_cause():
     ]}, source='evidence')
     claim = 'Intermittent upstream dependency failures are causing 502 errors, elevated error rate, and high latency.'
     with pytest.raises(ValueError, match='cause-specific'):
-        _validate_diagnosis({'hypotheses': [{'claim': claim, 'status': 'supported', 'supporting_evidence_ids': ['obs']}], 'evidence_requests': []}, [obs], 'diagnosis')
+        validate_diagnosis({'hypotheses': [{'claim': claim, 'status': 'supported', 'supporting_evidence_ids': ['obs']}], 'evidence_requests': []}, [obs], 'diagnosis')
     target = _entry('hyp', 'hypothesis', {'claim': claim, 'status': 'supported', 'supporting_evidence_ids': ['obs']})
     with pytest.raises(ValueError, match='cannot accept'):
-        _validate_review({'target_entry_id': 'hyp', 'target_revision': 1, 'verdict': 'accept', 'rationale': '502 indicates dependency failure', 'supporting_evidence_ids': ['obs'], 'required_follow_up': None}, target, [obs], 'review_hypotheses', set())
+        validate_review({'target_entry_id': 'hyp', 'target_revision': 1, 'verdict': 'accept', 'rationale': '502 indicates dependency failure', 'supporting_evidence_ids': ['obs'], 'required_follow_up': None}, target, [obs], 'review_hypotheses', set())
 
 
 def test_reviewer_receives_tool_contract_and_repairs_invalid_arguments():
