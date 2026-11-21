@@ -1,0 +1,604 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-21T08:15:41.766369+00:00",
+  "title": "Design System: Campus IT Incident Investigator",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "oklch(0.150 0.0258 259.15)",
+          "oklch(0.260 0.0511 259.15)",
+          "oklch(0.370 0.0704 259.15)",
+          "oklch(0.490 0.0819 259.15)",
+          "oklch(0.610 0.0819 259.15)",
+          "oklch(0.730 0.0704 259.15)",
+          "oklch(0.850 0.0490 259.15)",
+          "oklch(0.950 0.0258 259.15)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Primary Hover",
+        "tonalRamp": [
+          "oklch(0.150 0.0175 257.45)",
+          "oklch(0.260 0.0347 257.45)",
+          "oklch(0.370 0.0478 257.45)",
+          "oklch(0.490 0.0557 257.45)",
+          "oklch(0.610 0.0557 257.45)",
+          "oklch(0.730 0.0478 257.45)",
+          "oklch(0.850 0.0333 257.45)",
+          "oklch(0.950 0.0175 257.45)"
+        ]
+      },
+      "primary-ink": {
+        "role": "primary",
+        "displayName": "Primary Ink",
+        "tonalRamp": [
+          "oklch(0.150 0.0156 262.80)",
+          "oklch(0.260 0.0310 262.80)",
+          "oklch(0.370 0.0427 262.80)",
+          "oklch(0.490 0.0497 262.80)",
+          "oklch(0.610 0.0497 262.80)",
+          "oklch(0.730 0.0427 262.80)",
+          "oklch(0.850 0.0297 262.80)",
+          "oklch(0.950 0.0156 262.80)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "tonalRamp": [
+          "oklch(0.150 0.0105 269.56)",
+          "oklch(0.260 0.0209 269.56)",
+          "oklch(0.370 0.0288 269.56)",
+          "oklch(0.490 0.0335 269.56)",
+          "oklch(0.610 0.0335 269.56)",
+          "oklch(0.730 0.0288 269.56)",
+          "oklch(0.850 0.0201 269.56)",
+          "oklch(0.950 0.0105 269.56)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(0.150 0.0138 259.61)",
+          "oklch(0.260 0.0274 259.61)",
+          "oklch(0.370 0.0377 259.61)",
+          "oklch(0.490 0.0439 259.61)",
+          "oklch(0.610 0.0439 259.61)",
+          "oklch(0.730 0.0377 259.61)",
+          "oklch(0.850 0.0263 259.61)",
+          "oklch(0.950 0.0138 259.61)"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Field",
+        "tonalRamp": [
+          "oklch(0.150 0.0157 263.68)",
+          "oklch(0.260 0.0311 263.68)",
+          "oklch(0.370 0.0429 263.68)",
+          "oklch(0.490 0.0499 263.68)",
+          "oklch(0.610 0.0499 263.68)",
+          "oklch(0.730 0.0429 263.68)",
+          "oklch(0.850 0.0298 263.68)",
+          "oklch(0.950 0.0157 263.68)"
+        ]
+      },
+      "text": {
+        "role": "neutral",
+        "displayName": "Text",
+        "tonalRamp": [
+          "oklch(0.150 0.0051 259.42)",
+          "oklch(0.260 0.0102 259.42)",
+          "oklch(0.370 0.0140 259.42)",
+          "oklch(0.490 0.0163 259.42)",
+          "oklch(0.610 0.0163 259.42)",
+          "oklch(0.730 0.0140 259.42)",
+          "oklch(0.850 0.0098 259.42)",
+          "oklch(0.950 0.0051 259.42)"
+        ]
+      },
+      "copy": {
+        "role": "neutral",
+        "displayName": "Copy",
+        "tonalRamp": [
+          "oklch(0.150 0.0115 255.97)",
+          "oklch(0.260 0.0227 255.97)",
+          "oklch(0.370 0.0313 255.97)",
+          "oklch(0.490 0.0365 255.97)",
+          "oklch(0.610 0.0365 255.97)",
+          "oklch(0.730 0.0313 255.97)",
+          "oklch(0.850 0.0218 255.97)",
+          "oklch(0.950 0.0115 255.97)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(0.150 0.0152 258.37)",
+          "oklch(0.260 0.0301 258.37)",
+          "oklch(0.370 0.0415 258.37)",
+          "oklch(0.490 0.0483 258.37)",
+          "oklch(0.610 0.0483 258.37)",
+          "oklch(0.730 0.0415 258.37)",
+          "oklch(0.850 0.0289 258.37)",
+          "oklch(0.950 0.0152 258.37)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "oklch(0.150 0.0166 259.01)",
+          "oklch(0.260 0.0329 259.01)",
+          "oklch(0.370 0.0453 259.01)",
+          "oklch(0.490 0.0527 259.01)",
+          "oklch(0.610 0.0527 259.01)",
+          "oklch(0.730 0.0453 259.01)",
+          "oklch(0.850 0.0315 259.01)",
+          "oklch(0.950 0.0166 259.01)"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus",
+        "tonalRamp": [
+          "oklch(0.150 0.0206 254.77)",
+          "oklch(0.260 0.0409 254.77)",
+          "oklch(0.370 0.0563 254.77)",
+          "oklch(0.490 0.0655 254.77)",
+          "oklch(0.610 0.0655 254.77)",
+          "oklch(0.730 0.0563 254.77)",
+          "oklch(0.850 0.0392 254.77)",
+          "oklch(0.950 0.0206 254.77)"
+        ]
+      },
+      "tab-track": {
+        "role": "neutral",
+        "displayName": "Tab Track",
+        "tonalRamp": [
+          "oklch(0.150 0.0119 261.56)",
+          "oklch(0.260 0.0236 261.56)",
+          "oklch(0.370 0.0325 261.56)",
+          "oklch(0.490 0.0378 261.56)",
+          "oklch(0.610 0.0378 261.56)",
+          "oklch(0.730 0.0325 261.56)",
+          "oklch(0.850 0.0226 261.56)",
+          "oklch(0.950 0.0119 261.56)"
+        ]
+      },
+      "tab-active": {
+        "role": "neutral",
+        "displayName": "Tab Active",
+        "tonalRamp": [
+          "oklch(0.150 0.0177 257.62)",
+          "oklch(0.260 0.0352 257.62)",
+          "oklch(0.370 0.0485 257.62)",
+          "oklch(0.490 0.0564 257.62)",
+          "oklch(0.610 0.0564 257.62)",
+          "oklch(0.730 0.0485 257.62)",
+          "oklch(0.850 0.0337 257.62)",
+          "oklch(0.950 0.0177 257.62)"
+        ]
+      },
+      "tab-text": {
+        "role": "neutral",
+        "displayName": "Tab Text",
+        "tonalRamp": [
+          "oklch(0.150 0.0124 258.81)",
+          "oklch(0.260 0.0245 258.81)",
+          "oklch(0.370 0.0338 258.81)",
+          "oklch(0.490 0.0393 258.81)",
+          "oklch(0.610 0.0393 258.81)",
+          "oklch(0.730 0.0338 258.81)",
+          "oklch(0.850 0.0235 258.81)",
+          "oklch(0.950 0.0124 258.81)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Secondary",
+        "tonalRamp": [
+          "oklch(0.150 0.0151 260.69)",
+          "oklch(0.260 0.0300 260.69)",
+          "oklch(0.370 0.0414 260.69)",
+          "oklch(0.490 0.0482 260.69)",
+          "oklch(0.610 0.0482 260.69)",
+          "oklch(0.730 0.0414 260.69)",
+          "oklch(0.850 0.0288 260.69)",
+          "oklch(0.950 0.0151 260.69)"
+        ]
+      },
+      "secondary-text": {
+        "role": "neutral",
+        "displayName": "Secondary Text",
+        "tonalRamp": [
+          "oklch(0.150 0.0086 258.37)",
+          "oklch(0.260 0.0170 258.37)",
+          "oklch(0.370 0.0234 258.37)",
+          "oklch(0.490 0.0272 258.37)",
+          "oklch(0.610 0.0272 258.37)",
+          "oklch(0.730 0.0234 258.37)",
+          "oklch(0.850 0.0163 258.37)",
+          "oklch(0.950 0.0086 258.37)"
+        ]
+      },
+      "pill": {
+        "role": "neutral",
+        "displayName": "Pill",
+        "tonalRamp": [
+          "oklch(0.150 0.0157 259.04)",
+          "oklch(0.260 0.0312 259.04)",
+          "oklch(0.370 0.0430 259.04)",
+          "oklch(0.490 0.0500 259.04)",
+          "oklch(0.610 0.0500 259.04)",
+          "oklch(0.730 0.0430 259.04)",
+          "oklch(0.850 0.0299 259.04)",
+          "oklch(0.950 0.0157 259.04)"
+        ]
+      },
+      "pill-text": {
+        "role": "neutral",
+        "displayName": "Pill Text",
+        "tonalRamp": [
+          "oklch(0.150 0.0162 257.37)",
+          "oklch(0.260 0.0321 257.37)",
+          "oklch(0.370 0.0442 257.37)",
+          "oklch(0.490 0.0514 257.37)",
+          "oklch(0.610 0.0514 257.37)",
+          "oklch(0.730 0.0442 257.37)",
+          "oklch(0.850 0.0308 257.37)",
+          "oklch(0.950 0.0162 257.37)"
+        ]
+      },
+      "cyan": {
+        "role": "secondary",
+        "displayName": "Cyan",
+        "tonalRamp": [
+          "oklch(0.150 0.0286 208.67)",
+          "oklch(0.260 0.0566 208.67)",
+          "oklch(0.370 0.0780 208.67)",
+          "oklch(0.490 0.0908 208.67)",
+          "oklch(0.610 0.0908 208.67)",
+          "oklch(0.730 0.0780 208.67)",
+          "oklch(0.850 0.0543 208.67)",
+          "oklch(0.950 0.0286 208.67)"
+        ]
+      },
+      "cyan-ground": {
+        "role": "neutral",
+        "displayName": "Cyan Ground",
+        "tonalRamp": [
+          "oklch(0.150 0.0123 222.55)",
+          "oklch(0.260 0.0244 222.55)",
+          "oklch(0.370 0.0337 222.55)",
+          "oklch(0.490 0.0392 222.55)",
+          "oklch(0.610 0.0392 222.55)",
+          "oklch(0.730 0.0337 222.55)",
+          "oklch(0.850 0.0234 222.55)",
+          "oklch(0.950 0.0123 222.55)"
+        ]
+      },
+      "violet": {
+        "role": "secondary",
+        "displayName": "Violet",
+        "tonalRamp": [
+          "oklch(0.150 0.0341 296.81)",
+          "oklch(0.260 0.0677 296.81)",
+          "oklch(0.370 0.0933 296.81)",
+          "oklch(0.490 0.1085 296.81)",
+          "oklch(0.610 0.1085 296.81)",
+          "oklch(0.730 0.0933 296.81)",
+          "oklch(0.850 0.0649 296.81)",
+          "oklch(0.950 0.0341 296.81)"
+        ]
+      },
+      "violet-ground": {
+        "role": "neutral",
+        "displayName": "Violet Ground",
+        "tonalRamp": [
+          "oklch(0.150 0.0169 294.90)",
+          "oklch(0.260 0.0335 294.90)",
+          "oklch(0.370 0.0462 294.90)",
+          "oklch(0.490 0.0537 294.90)",
+          "oklch(0.610 0.0537 294.90)",
+          "oklch(0.730 0.0462 294.90)",
+          "oklch(0.850 0.0321 294.90)",
+          "oklch(0.950 0.0169 294.90)"
+        ]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "Amber",
+        "tonalRamp": [
+          "oklch(0.150 0.0294 77.38)",
+          "oklch(0.260 0.0583 77.38)",
+          "oklch(0.370 0.0803 77.38)",
+          "oklch(0.490 0.0935 77.38)",
+          "oklch(0.610 0.0935 77.38)",
+          "oklch(0.730 0.0803 77.38)",
+          "oklch(0.850 0.0559 77.38)",
+          "oklch(0.950 0.0294 77.38)"
+        ]
+      },
+      "amber-ground": {
+        "role": "neutral",
+        "displayName": "Amber Ground",
+        "tonalRamp": [
+          "oklch(0.150 0.0075 82.76)",
+          "oklch(0.260 0.0149 82.76)",
+          "oklch(0.370 0.0205 82.76)",
+          "oklch(0.490 0.0239 82.76)",
+          "oklch(0.610 0.0239 82.76)",
+          "oklch(0.730 0.0205 82.76)",
+          "oklch(0.850 0.0143 82.76)",
+          "oklch(0.950 0.0075 82.76)"
+        ]
+      },
+      "mint": {
+        "role": "secondary",
+        "displayName": "Mint",
+        "tonalRamp": [
+          "oklch(0.150 0.0326 169.32)",
+          "oklch(0.260 0.0646 169.32)",
+          "oklch(0.370 0.0890 169.32)",
+          "oklch(0.490 0.1036 169.32)",
+          "oklch(0.610 0.1036 169.32)",
+          "oklch(0.730 0.0890 169.32)",
+          "oklch(0.850 0.0620 169.32)",
+          "oklch(0.950 0.0326 169.32)"
+        ]
+      },
+      "mint-ground": {
+        "role": "neutral",
+        "displayName": "Mint Ground",
+        "tonalRamp": [
+          "oklch(0.150 0.0107 186.39)",
+          "oklch(0.260 0.0212 186.39)",
+          "oklch(0.370 0.0292 186.39)",
+          "oklch(0.490 0.0339 186.39)",
+          "oklch(0.610 0.0339 186.39)",
+          "oklch(0.730 0.0292 186.39)",
+          "oklch(0.850 0.0203 186.39)",
+          "oklch(0.950 0.0107 186.39)"
+        ]
+      },
+      "rose": {
+        "role": "secondary",
+        "displayName": "Rose",
+        "tonalRamp": [
+          "oklch(0.150 0.0318 6.65)",
+          "oklch(0.260 0.0632 6.65)",
+          "oklch(0.370 0.0870 6.65)",
+          "oklch(0.490 0.1012 6.65)",
+          "oklch(0.610 0.1012 6.65)",
+          "oklch(0.730 0.0870 6.65)",
+          "oklch(0.850 0.0606 6.65)",
+          "oklch(0.950 0.0318 6.65)"
+        ]
+      },
+      "rose-ground": {
+        "role": "neutral",
+        "displayName": "Rose Ground",
+        "tonalRamp": [
+          "oklch(0.150 0.0126 330.30)",
+          "oklch(0.260 0.0250 330.30)",
+          "oklch(0.370 0.0344 330.30)",
+          "oklch(0.490 0.0401 330.30)",
+          "oklch(0.610 0.0401 330.30)",
+          "oklch(0.730 0.0344 330.30)",
+          "oklch(0.850 0.0240 330.30)",
+          "oklch(0.950 0.0126 330.30)"
+        ]
+      },
+      "evidence-agent": {
+        "role": "secondary",
+        "displayName": "Evidence Agent",
+        "tonalRamp": [
+          "oklch(0.150 0.0338 210.95)",
+          "oklch(0.260 0.0671 210.95)",
+          "oklch(0.370 0.0924 210.95)",
+          "oklch(0.490 0.1075 210.95)",
+          "oklch(0.610 0.1075 210.95)",
+          "oklch(0.730 0.0924 210.95)",
+          "oklch(0.850 0.0643 210.95)",
+          "oklch(0.950 0.0338 210.95)"
+        ]
+      },
+      "diagnosis-agent": {
+        "role": "secondary",
+        "displayName": "Diagnosis Agent",
+        "tonalRamp": [
+          "oklch(0.150 0.0445 293.54)",
+          "oklch(0.260 0.0882 293.54)",
+          "oklch(0.370 0.1215 293.54)",
+          "oklch(0.490 0.1413 293.54)",
+          "oklch(0.610 0.1413 293.54)",
+          "oklch(0.730 0.1215 293.54)",
+          "oklch(0.850 0.0846 293.54)",
+          "oklch(0.950 0.0445 293.54)"
+        ]
+      },
+      "review-agent": {
+        "role": "secondary",
+        "displayName": "Review Agent",
+        "tonalRamp": [
+          "oklch(0.150 0.0334 77.26)",
+          "oklch(0.260 0.0663 77.26)",
+          "oklch(0.370 0.0913 77.26)",
+          "oklch(0.490 0.1062 77.26)",
+          "oklch(0.610 0.1062 77.26)",
+          "oklch(0.730 0.0913 77.26)",
+          "oklch(0.850 0.0636 77.26)",
+          "oklch(0.950 0.0334 77.26)"
+        ]
+      },
+      "response-agent": {
+        "role": "secondary",
+        "displayName": "Response Agent",
+        "tonalRamp": [
+          "oklch(0.150 0.0362 166.68)",
+          "oklch(0.260 0.0717 166.68)",
+          "oklch(0.370 0.0988 166.68)",
+          "oklch(0.490 0.1149 166.68)",
+          "oklch(0.610 0.1149 166.68)",
+          "oklch(0.730 0.0988 166.68)",
+          "oklch(0.850 0.0688 166.68)",
+          "oklch(0.950 0.0362 166.68)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "purpose": "Product title; narrows at 800px."
+      },
+      "body": {
+        "purpose": "Finding and response reading copy, maximum 76ch."
+      }
+    },
+    "shadows": [
+      {
+        "name": "theatre-active",
+        "value": "0 0 25px color-mix(in srgb,var(--accent) 20%,transparent)",
+        "purpose": "Inherited active specialist only."
+      },
+      {
+        "name": "theatre-hub",
+        "value": "0 0 45px #5599ff15",
+        "purpose": "Inherited shared board hub."
+      }
+    ],
+    "motion": [
+      {
+        "name": "theatre-route",
+        "value": "flow 1s linear infinite",
+        "purpose": "Inherited active exchange; disabled for reduced motion."
+      },
+      {
+        "name": "theatre-bob",
+        "value": "bob 1.5s ease-in-out infinite",
+        "purpose": "Inherited active robot; disabled for reduced motion."
+      },
+      {
+        "name": "theatre-arrival",
+        "value": "arrive .3s ease-out",
+        "purpose": "Inherited work-log entry; disabled for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "theatre-stack",
+        "value": "980px"
+      },
+      {
+        "name": "workspace-narrow",
+        "value": "800px"
+      },
+      {
+        "name": "compact-and-table-hint",
+        "value": "600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Native control skin; native runtime owns padding, disabled behavior, and execution.",
+      "html": "<button class=\"ds-primary\">Start a fresh investigation</button>",
+      "css": ".ds-primary{font:650 14px sans-serif;background:#a8caff;color:#0c1830;border:1px solid #bed8ff;border-radius:10px;min-height:42px}.ds-primary:hover{background:#c2dbff;border-color:#e0ecff}.ds-primary:focus-visible{outline:2px solid #b6d6ff;outline-offset:3px}"
+    },
+    {
+      "name": "Secondary control",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary Streamlit control skin; native hover remains framework-owned.",
+      "html": "<button class=\"ds-secondary\">Replay</button>",
+      "css": ".ds-secondary{font:14px sans-serif;background:#18263e;color:#dce8fa;border:1px solid #3c5072;border-radius:9px}.ds-secondary:focus-visible{outline:2px solid #b6d6ff;outline-offset:3px}"
+    },
+    {
+      "name": "Case selector",
+      "kind": "input",
+      "refersTo": "",
+      "description": "Static native-select illustration of the outer selectbox skin; Streamlit owns popup and focus implementation.",
+      "html": "<label class=\"ds-label\">Investigation case<select class=\"ds-select\"><option>Database pool exhaustion</option><option>DNS resolution</option></select></label>",
+      "css": ".ds-label{font:12px sans-serif;color:#aabed9}.ds-select{display:block;font:14px sans-serif;background:#142039;color:#e6edf8;border:1px solid #354762;border-radius:10px}"
+    },
+    {
+      "name": "Investigation tabs",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Static visual sample; production uses native keyboard-operable Streamlit tabs, not these spans.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Investigation views\"><span class=\"ds-active\">Observations</span><span>Hypotheses</span><span>Activity</span></nav>",
+      "css": ".ds-tabs{display:flex;gap:6px;background:#101a2c;border:1px solid #2a3a55;border-radius:12px;padding:6px;color:#94a9c9;font:600 13px sans-serif;overflow:auto}.ds-tabs span{padding:10px 16px;border-radius:8px;white-space:nowrap}.ds-tabs .ds-active{background:#253956;color:#d4e5ff}"
+    },
+    {
+      "name": "Role and status labels",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "Noninteractive labels communicate role and outcome in words and color.",
+      "html": "<span class=\"ds-pill\">Evidence agent</span> <span class=\"ds-pill ds-completed\">Completed</span>",
+      "css": ".ds-pill{display:inline-flex;border:1px solid #2a5564;border-radius:20px;padding:4px 9px;font:600 12px/1.6 sans-serif;letter-spacing:.2px;color:#7eddec;background:#13313b}.ds-pill.ds-completed{color:#83e5c3;background:#15312e;border-color:#2b5d53}"
+    },
+    {
+      "name": "Finding record",
+      "kind": "card",
+      "refersTo": "record-card",
+      "description": "Readable evidence, diagnosis, or decision container.",
+      "html": "<article class=\"ds-record\"><h4>Service metrics</h4><p>Measurements gathered for the current investigation.</p></article>",
+      "css": ".ds-record{border:1px solid #30425e;border-radius:12px;background:#111e33;padding:19px 21px;font-family:sans-serif}.ds-record h4{color:#e5edfa;font-size:17px;font-weight:600;line-height:1.6;margin:0 0 9px}.ds-record p{font-size:14px;line-height:1.85;color:#bdcee5;max-width:76ch;margin:0 0 13px;overflow-wrap:anywhere}@media(max-width:800px){.ds-record{padding:15px}}"
+    },
+    {
+      "name": "Evidence table",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Illustrative measurement content; focusable local overflow preserves table structure.",
+      "html": "<div class=\"ds-table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Evidence source records\"><table class=\"ds-table\"><thead><tr><th scope=\"col\">Measurement</th><th scope=\"col\">Value</th><th scope=\"col\">Unit</th></tr></thead><tbody><tr><td>Connection pool</td><td class=\"ds-numeric\">95</td><td>percent</td></tr></tbody></table></div>",
+      "css": ".ds-table-wrap{overflow:auto;border:1px solid #30415b;border-radius:9px;margin-top:14px}.ds-table{border-collapse:collapse;width:100%;min-width:560px;text-align:left;font:14px sans-serif}.ds-table th{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:#91b0d4;background:#192b45;padding:10px 13px}.ds-table td{padding:11px 13px;color:#d2def0;border-top:1px solid #293b54;overflow-wrap:anywhere;max-width:380px}.ds-table .ds-numeric{color:#80e4c8;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Shared Investigation Board",
+    "overview": "A dark, evidence-led workspace for following synthetic campus IT investigations. Navy surfaces, pale blue actions, and restrained specialist colors extend the existing Agent theatre identity. Findings remain readable before source identifiers and raw records are disclosed.\n\nThe application uses native Streamlit controls for starting runs, choosing cases, navigating tabs, and disclosing details. Agent theatre remains its own embedded interactive surface; its smaller type and motion vocabulary are inherited rather than a template for the reading views.",
+    "keyCharacteristics": [
+      "Navy grounds with pale blue controls.",
+      "Readable findings, revision-aware reviews, and progressively disclosed source metadata.",
+      "Full-border evidence panels and a compact run summary.",
+      "Native controls alongside the existing Agent theatre."
+    ],
+    "rules": [
+      {
+        "name": "The Shared Role Rule",
+        "body": "Use cyan for Evidence, violet for Diagnosis, amber for Review, and mint for Response; retain written role and status labels alongside color.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reading First Rule",
+        "body": "Present findings and response checks before raw source metadata; keep longer reading copy within the implemented measure.",
+        "section": "typography"
+      },
+      {
+        "name": "The Quiet Surface Rule",
+        "body": "Use tonal surfaces and full borders for the reading workspace; reserve the inherited activity glow for Agent theatre.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do preserve native Streamlit control semantics, labels, keyboard operation, and visible focus.",
+      "Do keep numeric values and units intact and allow evidence tables to scroll locally.",
+      "Do retain explicit Offline/Live model mode and recommendation-only language.",
+      "Do keep review verdicts attached to the exact finding or response revision."
+    ],
+    "donts": [
+      "Don't use role or status color as the only explanation.",
+      "Don't replace readable evidence with raw JSON as the first presentation.",
+      "Don't propagate Agent theatre\u2019s compact inspector type into the reading workspace."
+    ]
+  }
+}

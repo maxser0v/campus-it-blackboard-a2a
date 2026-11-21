@@ -1,0 +1,24 @@
+{
+  "status": "verified",
+  "visual_review_disposition": "ship",
+  "tests": {
+    "passed": 151,
+    "failed": 0
+  },
+  "mode": "offline",
+  "verified": [
+    "fresh run",
+    "completed run",
+    "all six tabs",
+    "activity filter and persistence",
+    "exact revision history",
+    "Agent theatre replay",
+    "desktop 1440x1000",
+    "mobile 390x844",
+    "local table scrolling",
+    "mobile main width equals scroll width"
+  ],
+  "design_guidance": "https://impeccable.style/",
+  "design_guidance_mode": "Read official skill and playbooks directly after context launcher failed; no engine retry or detector claim.",
+  "screenshot": "output/dashboard-redesign.jpg"
+}

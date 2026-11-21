@@ -1,0 +1,11 @@
+{
+  "kind": "browser-screenshot",
+  "origin": "http://127.0.0.1:18501/",
+  "content": "Isolated offline synthetic db_pool investigation",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "view": "desktop-evidence",
+  "capture": "Native browser capture; unedited. Detail views intentionally scrolled; desktop.jpg and mobile.jpg start at the document top."
+}

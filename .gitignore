@@ -22,3 +22,6 @@ traces/
 # Original course handouts are kept locally
 /*.docx
 
+
+# Local UI review captures
+.impeccable/review/

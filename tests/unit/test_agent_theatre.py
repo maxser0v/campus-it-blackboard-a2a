@@ -51,3 +51,46 @@ def test_terminal_notices_do_not_move_tabs_and_reset_the_selected_view():
         assert [tab.label for tab in app.tabs][-1] == "Agent theatre"
         positions.append(next(index for index, child in app.main.children.items() if child.type == "tab_container"))
     assert len(set(positions)) == 1
+
+
+def test_work_log_preserves_complete_public_explanations_and_tool_results():
+    explanation = "Explain the selected metric. " * 100
+    observed = {"rationale": explanation, "tool_name": "query_metrics", "query": {"metric": "pool"},
+                "records": [{"name": "pool_usage", "value": 98}], "source_ids": ["metrics-1"],
+                "dispatch_result": {"dispatch_id": "task-1"}, "private_reasoning": "Do not expose this"}
+    event = theatre_events({"entries": [entry("observation", observed, "evidence")]})[0]
+    sections = {section["label"]: section["text"] for section in event["sections"]}
+    assert sections["Why this evidence was collected"] == explanation
+    assert '"value": 98' in sections["Observed results"]
+    assert "metrics-1" in sections["Sources"]
+    assert event["dispatch"] == "task-1"
+    assert "Do not expose this" not in str(event)
+
+
+def test_work_log_shows_review_explanation_and_exact_target_revision():
+    review = {"verdict": "request_evidence", "rationale": "Pool usage alone does not exclude a leaked connection.",
+              "target_entry_id": "hypothesis-1", "target_revision": 2,
+              "supporting_evidence_ids": ["observation-1"],
+              "required_follow_up": {"question": "Are connections being returned?"}}
+    event = theatre_events({"entries": [{**entry("review", review, "review"), "revision": 3}]})[0]
+    sections = {section["label"]: section["text"] for section in event["sections"]}
+    assert sections["Published review explanation"] == review["rationale"]
+    assert sections["Reviewed revision"] == "2"
+    assert "Are connections being returned?" in sections["Required follow-up"]
+    assert event["revision"] == 3
+
+
+def test_work_log_records_controller_trigger_and_ordered_response_checks():
+    history = [entry("controller_decision", {"event_type": "dispatch_started", "agent": "response",
+                "purpose": "propose_response", "trigger": {"accepted_hypothesis": "hypothesis-1"}}),
+               entry("solution", {"summary": "Review connection use", "actions": [
+                   {"step": "Inspect long-lived sessions", "purpose": "Find unreleased connections", "expected_check": "Idle sessions identified"},
+                   {"step": "Review limits", "purpose": "Confirm capacity", "expected_check": "Limits documented"}],
+                   "caveats": ["Approval required"], "runbook_ids": ["pool-runbook"]}, "response")]
+    first, second = theatre_events({"history": history})
+    assert "hypothesis-1" in str(first["sections"])
+    sections = {section["label"]: section["text"] for section in second["sections"]}
+    assert sections["Recovery steps and expected checks"].startswith("1. Inspect long-lived sessions")
+    assert "2. Review limits" in sections["Recovery steps and expected checks"]
+    assert "Expected check: Limits documented" in sections["Recovery steps and expected checks"]
+    assert "Approval required" in sections["Limitations and caveats"]
