@@ -9,6 +9,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from ..langchain_adapter import specialist_chain
 from ..model_adapter import ModelAdapter, model_from_settings
 from ..tools import ToolRegistry, read_case_summary
 from ..tools.fixtures import read_query_catalog, validate_fixture_arguments
@@ -398,6 +399,7 @@ class SpecialistRunner:
         self.role = role
         self.blackboard = blackboard
         self.model = model
+        self.chain = specialist_chain(model)
         self.tools = tools or ToolRegistry()
         self.actor = str(getattr(blackboard, "actor", role))
         self.last_run_usage: list[dict[str, Any]] = []
@@ -430,13 +432,13 @@ class SpecialistRunner:
                 },
             }
             try:
-                raw = await self.model.complete(
-                    role=self.role,
-                    purpose=purpose,
-                    instructions=instructions,
-                    context=request_context,
-                    output_schema=schema,
-                )
+                raw = await self.chain.ainvoke({
+                    "instructions": instructions,
+                    "task": json.dumps({"role": self.role, "purpose": purpose,
+                                        "context": request_context, "output_schema": schema}),
+                }, config={"run_name": f"{self.role}:{purpose}",
+                           "tags": ["specialist", self.role],
+                           "metadata": {"role": self.role, "purpose": purpose, "attempt": attempt + 1}})
             finally:
                 metadata = getattr(self.model, "last_call_metadata", None)
                 if isinstance(metadata, Mapping):

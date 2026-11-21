@@ -1,5 +1,9 @@
 # Implementation status
 
+## Framework migration — 21 November 2026
+
+The application uses LangGraph for controller orchestration and LangChain for specialist model chains and structured tools. A2A transport, Blackboard persistence, existing provider settings and the dashboard remain integrated. The full offline test suite passed **154 tests**, including real service acceptance for database, DNS and insufficient-evidence outcomes. Live provider calls were not repeated for this migration. See [framework implementation and restart instructions](langgraph-langchain.md).
+
 **As of:** 7 November 2026  
 **Status:** Local prototype implemented and offline fixture-verified. The tests and fixture runs below use the explicit offline adapter; they do not demonstrate live-model performance or a real campus incident response.
 

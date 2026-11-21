@@ -5,7 +5,7 @@ A local university demonstration prototype for investigating synthetic campus IT
 ## Product behavior
 
 - Four specialist agents—Evidence, Diagnosis, Review, and Response—communicate through A2A and share versioned findings in a persistent SQLite-backed Blackboard.
-- A separate deterministic controller schedules specialist tasks using evidence requests, entry revisions, and review outcomes.
+- A separate LangGraph controller uses deterministic rules to schedule specialist tasks using evidence requests, entry revisions, and review outcomes.
 - The Streamlit dashboard starts a fresh investigation when the user presses its start action. Its recurring status and Blackboard reads use a read-only dashboard identity; refresh does not dispatch additional work.
 - The dashboard exposes observations, hypotheses, activity, controller decisions, response proposals, and an embedded Agent theatre with robot selection and live/recorded replay controls.
 - Reviews apply to exact finding or proposal revisions. Source references, request outcomes, and raw details remain inspectable.

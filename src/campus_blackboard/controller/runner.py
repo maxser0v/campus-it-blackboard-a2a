@@ -1,4 +1,4 @@
-"""Bounded controller loop that re-reads the Blackboard after every task."""
+"""Bounded LangGraph controller with A2A specialist nodes and Blackboard routing."""
 
 from __future__ import annotations
 
@@ -6,9 +6,11 @@ import asyncio
 import inspect
 import time
 import uuid
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Awaitable, Callable, Mapping
+from typing import Any, Awaitable, Callable, Mapping, TypedDict
+
+from langgraph.graph import END, START, StateGraph
 
 from .scheduler import DispatchPlan, TerminalPlan, choose_next_action
 
@@ -30,6 +32,8 @@ class RunResult:
     observed_model_tokens: int = 0
     model_usage_state: str = "unmeasured"
     max_run_tokens: int | None = None
+    orchestrator: str = "langgraph"
+    workflow_nodes: list[str] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -106,8 +110,23 @@ def _usage_total(result: Mapping[str, Any]) -> tuple[int, bool, list[dict[str, A
     return total, bool(measured_any and complete), clean
 
 
+class InvestigationState(TypedDict, total=False):
+    """Ephemeral graph state; persistent knowledge lives only in the Blackboard."""
+
+    problem_id: str
+    snapshot: dict[str, Any]
+    plan: DispatchPlan | TerminalPlan
+    next_node: str
+    terminal: TerminalPlan
+    dispatch_count: int
+    last_dispatch_id: str | None
+    observed_model_tokens: int
+    token_usage_complete: bool
+    token_usage_seen: bool
+
+
 class ControllerRunner:
-    """Run one investigation with one active specialist task at a time.
+    """Run a conditional LangGraph with one active A2A specialist node at a time.
 
     `dispatch_agent(role, payload)` is injected by the service layer and uses
     the project's A2A client. Tests can supply a deterministic offline handler.
@@ -162,13 +181,14 @@ class ControllerRunner:
         started_at = _utc_now()
         monotonic_start = time.monotonic()
         deadline = monotonic_start + self.limits["timeout_seconds"]
-        dispatch_count = 0
-        last_dispatch_id = None
-        observed_model_tokens = 0
-        token_usage_complete = True
-        token_usage_seen = False
         max_run_tokens = self.limits["max_run_tokens"]
-        active_plan = None
+        # Physical side effects can precede a node's returned state. Keep this
+        # per-invocation journal for accurate failure bookkeeping and usage.
+        progress: dict[str, Any] = {
+            "dispatch_count": 0, "last_dispatch_id": None, "active_plan": None,
+            "observed_model_tokens": 0, "token_usage_complete": True,
+            "token_usage_seen": False, "workflow_nodes": [],
+        }
         error = None
 
         async def bounded(operation: Callable[[], Awaitable[Any]]) -> Any:
@@ -177,54 +197,56 @@ class ControllerRunner:
                 raise asyncio.TimeoutError
             return await asyncio.wait_for(operation(), timeout=remaining)
 
-        try:
+        async def read_and_route(state: InvestigationState) -> dict[str, Any]:
+            progress["workflow_nodes"].append("controller")
             snapshot = await bounded(lambda: self._snapshot(problem_id))
-            max_dispatches, timeout_seconds, max_run_tokens = _problem_limits(snapshot, self.limits)
-            deadline = monotonic_start + timeout_seconds
-            await bounded(lambda: self._set_status(problem_id, "investigating"))
-            while True:
-                snapshot = await bounded(lambda: self._snapshot(problem_id))
-                existing_events = _dispatch_events(snapshot.get("entries", []))
-                dispatch_count = max(dispatch_count, len({
-                    str(event["dispatch_id"]) for event in existing_events
-                    if event.get("event_type") == "dispatch_started" and event.get("dispatch_id")
-                }))
-                plan = choose_next_action(snapshot, dispatch_count=dispatch_count, max_dispatches=max_dispatches)
-                # A final successful review can consume the exact remaining budget.
-                if not (isinstance(plan, TerminalPlan) and plan.status == "completed"):
-                    if max_run_tokens is not None and observed_model_tokens >= max_run_tokens:
-                        plan = TerminalPlan("unresolved", "model_token_limit_reached")
-                if isinstance(plan, TerminalPlan):
-                    terminal = plan
-                    break
+            existing = _dispatch_events(snapshot.get("entries", []))
+            dispatch_count = max(state["dispatch_count"], len({
+                str(event["dispatch_id"]) for event in existing
+                if event.get("event_type") == "dispatch_started" and event.get("dispatch_id")
+            }))
+            progress["dispatch_count"] = dispatch_count
+            plan = choose_next_action(snapshot, dispatch_count=dispatch_count, max_dispatches=max_dispatches)
+            # Completion may use the exact final task/token allowance.
+            if not (isinstance(plan, TerminalPlan) and plan.status == "completed"):
+                if max_run_tokens is not None and state["observed_model_tokens"] >= max_run_tokens:
+                    plan = TerminalPlan("unresolved", "model_token_limit_reached")
+            return {"snapshot": snapshot, "plan": plan, "dispatch_count": dispatch_count,
+                    "next_node": "finish" if isinstance(plan, TerminalPlan) else plan.role}
 
+        def specialist_node(role: str):
+            async def dispatch(state: InvestigationState) -> dict[str, Any]:
+                progress["workflow_nodes"].append(role)
+                plan = state["plan"]
+                if not isinstance(plan, DispatchPlan) or plan.role != role:
+                    raise RuntimeError("LangGraph specialist route does not match its dispatch plan")
                 dispatch_id = str(uuid.uuid4())
-                last_dispatch_id = dispatch_id
-                active_plan = plan
+                progress["last_dispatch_id"] = dispatch_id
+                progress["active_plan"] = plan
                 await bounded(lambda: self._record_decision(problem_id, {
                     "event_type": "dispatch_started", "dispatch_id": dispatch_id,
-                    "dispatch_key": plan.dispatch_key, "agent": plan.role,
+                    "dispatch_key": plan.dispatch_key, "agent": role,
                     "purpose": plan.purpose, "trigger": plan.trigger,
-                    "board_revision": snapshot.get("problem", {}).get("board_revision"),
-                    "started_at": _utc_now(),
+                    "board_revision": state["snapshot"].get("problem", {}).get("board_revision"),
+                    "orchestrator": "langgraph", "graph_node": role, "started_at": _utc_now(),
                 }))
-                dispatch_count += 1
-                result = await bounded(lambda: self.dispatch_agent(plan.role, {
+                progress["dispatch_count"] = state["dispatch_count"] + 1
+                result = await bounded(lambda: self.dispatch_agent(role, {
                     "problem_id": problem_id, "purpose": plan.purpose, "dispatch_id": dispatch_id,
                 }))
                 if not isinstance(result, dict) or result.get("ok", True) is False:
                     raise RuntimeError(str(result.get("error", "specialist returned an unsuccessful result"))
                                        if isinstance(result, dict) else "specialist returned a non-object result")
-                task_tokens, task_usage_complete, model_usage = _usage_total(result)
-                observed_model_tokens += task_tokens
-                token_usage_seen = token_usage_seen or task_tokens > 0
-                token_usage_complete = token_usage_complete and task_usage_complete
+                task_tokens, complete, model_usage = _usage_total(result)
+                progress["observed_model_tokens"] = state["observed_model_tokens"] + task_tokens
+                progress["token_usage_seen"] = state["token_usage_seen"] or task_tokens > 0
+                progress["token_usage_complete"] = state["token_usage_complete"] and complete
                 metadata = result.get("_a2a", {})
                 if not isinstance(metadata, Mapping):
                     metadata = {}
                 await bounded(lambda: self._record_decision(problem_id, {
                     "event_type": "dispatch_finished", "dispatch_id": dispatch_id,
-                    "dispatch_key": plan.dispatch_key, "agent": plan.role,
+                    "dispatch_key": plan.dispatch_key, "agent": role,
                     "purpose": plan.purpose, "status": "completed",
                     "result_entry_ids": result.get("entry_ids", []),
                     "task_id": result.get("task_id") or metadata.get("task_id"),
@@ -232,21 +254,58 @@ class ControllerRunner:
                     "task_status": metadata.get("status") or metadata.get("state"),
                     "summary": str(result.get("summary", ""))[:500],
                     "model_usage": model_usage, "observed_model_tokens": task_tokens,
-                    "model_usage_complete": task_usage_complete, "finished_at": _utc_now(),
+                    "model_usage_complete": complete, "orchestrator": "langgraph",
+                    "graph_node": role, "finished_at": _utc_now(),
                 }))
-                active_plan = None
+                progress["active_plan"] = None
+                return {key: progress[key] for key in (
+                    "dispatch_count", "last_dispatch_id", "observed_model_tokens",
+                    "token_usage_seen", "token_usage_complete",
+                )}
+            return dispatch
+
+        def resolve_terminal(state: InvestigationState) -> dict[str, Any]:
+            progress["workflow_nodes"].append("finish")
+            if not isinstance(state["plan"], TerminalPlan):
+                raise RuntimeError("LangGraph finish requires a terminal decision")
+            return {"terminal": state["plan"]}
+
+        try:
+            snapshot = await bounded(lambda: self._snapshot(problem_id))
+            max_dispatches, timeout_seconds, max_run_tokens = _problem_limits(snapshot, self.limits)
+            deadline = monotonic_start + timeout_seconds
+            await bounded(lambda: self._set_status(problem_id, "investigating"))
+
+            builder = StateGraph(InvestigationState)
+            builder.add_node("controller", read_and_route)
+            for role in ("evidence", "diagnosis", "review", "response"):
+                builder.add_node(role, specialist_node(role))
+                builder.add_edge(role, "controller")
+            builder.add_node("finish", resolve_terminal)
+            builder.add_edge(START, "controller")
+            builder.add_conditional_edges("controller", lambda state: state["next_node"], {
+                role: role for role in ("evidence", "diagnosis", "review", "response", "finish")
+            })
+            builder.add_edge("finish", END)
+            graph = builder.compile(name="campus_incident_investigation")
+            final = await graph.ainvoke({
+                "problem_id": problem_id, "dispatch_count": 0, "last_dispatch_id": None,
+                "observed_model_tokens": 0, "token_usage_complete": True, "token_usage_seen": False,
+            }, config={"recursion_limit": max(10, 2 * max_dispatches + 4),
+                       "metadata": {"problem_id": problem_id, "orchestrator": "langgraph"}})
+            terminal = final["terminal"]
         except asyncio.TimeoutError:
             terminal = TerminalPlan("unresolved", "case_deadline_reached")
             error = "case_deadline_reached"
         except Exception as exc:
             error = f"{type(exc).__name__}: {str(exc)[:300]}"
-            terminal = TerminalPlan("blocked", "specialist_or_transport_failure" if active_plan else "controller_or_blackboard_failure")
+            terminal = TerminalPlan("blocked", "specialist_or_transport_failure" if progress["active_plan"] else "controller_or_blackboard_failure")
 
-        # Terminal persistence gets its own short allowance, never more specialist
-        # work. A stalled board must not leave the in-memory task running forever.
+        # Persist final status with a separate short allowance, including when
+        # a graph node fails or the investigation exhausts its time budget.
         async def bookkeeping() -> None:
-            if error and active_plan and last_dispatch_id:
-                await self._record_failure(problem_id, last_dispatch_id, active_plan, error)
+            if error and progress["active_plan"] and progress["last_dispatch_id"]:
+                await self._record_failure(problem_id, progress["last_dispatch_id"], progress["active_plan"], error)
             await self._finish(problem_id, terminal)
 
         try:
@@ -255,10 +314,10 @@ class ControllerRunner:
             detail = f"terminal bookkeeping failed: {type(exc).__name__}"
             error = f"{error}; {detail}" if error else detail
         return self._result(
-            problem_id, terminal, dispatch_count, started_at, last_dispatch_id,
-            error=error, observed_model_tokens=observed_model_tokens,
-            token_usage_seen=token_usage_seen, token_usage_complete=token_usage_complete,
-            max_run_tokens=max_run_tokens,
+            problem_id, terminal, progress["dispatch_count"], started_at, progress["last_dispatch_id"],
+            error=error, observed_model_tokens=progress["observed_model_tokens"],
+            token_usage_seen=progress["token_usage_seen"], token_usage_complete=progress["token_usage_complete"],
+            max_run_tokens=max_run_tokens, workflow_nodes=progress["workflow_nodes"],
         )
 
     async def _record_failure(
@@ -303,6 +362,7 @@ class ControllerRunner:
         token_usage_seen: bool = False,
         token_usage_complete: bool = False,
         max_run_tokens: int | None = None,
+        workflow_nodes: list[str] | None = None,
     ) -> RunResult:
         return RunResult(
             problem_id=problem_id,
@@ -320,4 +380,5 @@ class ControllerRunner:
                 else "unmeasured"
             ),
             max_run_tokens=max_run_tokens,
+            workflow_nodes=list(workflow_nodes or []),
         )

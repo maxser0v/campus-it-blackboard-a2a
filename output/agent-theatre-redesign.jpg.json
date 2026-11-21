@@ -1,0 +1,10 @@
+{
+  "kind": "browser-screenshot",
+  "view": "desktop",
+  "origin": "Isolated offline application at http://127.0.0.1:18501/",
+  "screenshotSize": {
+    "width": 1440,
+    "height": 1100
+  },
+  "content": "Synthetic incident data; desktop capture is intentionally scrolled to the theatre tab. Fixture captures are full-page, unedited."
+}

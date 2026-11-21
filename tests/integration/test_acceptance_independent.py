@@ -376,6 +376,9 @@ def test_real_a2a_discovery_task_ids_and_three_fixture_outcomes(local_services: 
     credentials = local_services["credentials"]
     blackboard_url = local_services["blackboard"]
     controller_url = local_services["controller"]
+    health = httpx.get(f"{controller_url}/health", timeout=3).json()
+    assert health["orchestrator"] == "langgraph"
+    assert health["agent_framework"] == "langchain"
 
     for role in ("blackboard", *ROLES):
         card_response = httpx.get(f"{local_services[role]}/.well-known/agent-card.json", timeout=3)
@@ -446,6 +449,9 @@ def test_real_a2a_discovery_task_ids_and_three_fixture_outcomes(local_services: 
             assert time.monotonic() < deadline, f"case {case_id} did not terminate: {run}"
             time.sleep(0.15)
         assert run["status"] == expected_status, (case_id, run)
+        assert run["result"]["orchestrator"] == "langgraph"
+        assert run["result"]["workflow_nodes"][0] == "controller"
+        assert run["result"]["workflow_nodes"][-1] == "finish"
         snapshot = asyncio.run(board.call("read_blackboard", problem_id=started["problem_id"]))
         entries = snapshot["entries"]
         history = snapshot["history"]
@@ -464,6 +470,8 @@ def test_real_a2a_discovery_task_ids_and_three_fixture_outcomes(local_services: 
         ]
         finished_by_id = {entry["data"].get("dispatch_id"): entry["data"] for entry in dispatch_finished}
         assert dispatch_started
+        assert all(event["data"]["orchestrator"] == "langgraph" for event in dispatch_started)
+        assert all(event["data"]["graph_node"] in ROLES for event in dispatch_started)
         assert len(dispatch_started) <= 12
         for event in dispatch_started:
             finished = finished_by_id.get(event["data"].get("dispatch_id"))

@@ -1,6 +1,6 @@
 # Campus IT Incident Investigator
 
-A local multi-agent prototype that investigates synthetic campus IT incidents. Evidence, Diagnosis, Review, and Response specialists communicate over A2A and share versioned findings in a persistent Blackboard. A deterministic controller schedules work from current evidence requests, entry revisions, and review results.
+A local multi-agent prototype that investigates synthetic campus IT incidents. Evidence, Diagnosis, Review, and Response specialists communicate over A2A and share versioned findings in a persistent Blackboard. A LangGraph controller routes work from current evidence requests, entry revisions, and review results. LangChain runs specialist prompt/model chains and the allowlisted evidence and runbook tools.
 
 The dashboard displays activity and evidence as it arrives. Its **Agent theatre** tab visualizes the four robot specialists, task activity, and Blackboard exchanges, with live and recorded replay controls for demonstrations. The system recommends diagnostic or recovery steps; it does not connect to campus infrastructure or execute remediation.
 
@@ -8,12 +8,16 @@ The dashboard displays activity and evidence as it arrives. Its **Agent theatre*
 
 - A Blackboard A2A service backed by SQLite.
 - Four independent A2A specialist services and one separate controller REST API.
+- LangGraph conditional routing with evidence, diagnosis, review, response, and finish nodes.
+- LangChain chat-model chains and structured tools, supporting the existing Codex CLI, OpenAI-compatible, and offline adapters.
 - A Streamlit dashboard that starts a run once, polls status, and reads the Blackboard through its read-only A2A identity.
 - Synthetic cases for database pool exhaustion, DNS resolution, and insufficient evidence.
 - Fixture evaluation and controller workflow tests.
 - A configurable OpenAI-compatible model adapter. The default offline mode is fixture-driven and makes no provider call.
 
 See [the architecture and scheduling rules](docs/architecture.md), [the live demo script](docs/demo-script.md), and [the evaluation method](docs/evaluation.md).
+
+See [the LangGraph and LangChain implementation](docs/langgraph-langchain.md) for the workflow, provider integration, and migration notes.
 
 ## Setup
 

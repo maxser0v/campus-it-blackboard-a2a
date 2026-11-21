@@ -232,6 +232,11 @@ def test_controller_runs_conditional_evidence_loop_to_reviewed_solution(dispatch
         assert result.status == "completed"
         assert result.reason == "current_supported_diagnosis_and_solution_accepted"
         assert result.dispatch_count <= 12
+        assert result.orchestrator == "langgraph"
+        assert result.workflow_nodes[0] == "controller"
+        assert result.workflow_nodes[-1] == "finish"
+        assert [node for node in result.workflow_nodes if node not in {"controller", "finish"}] == [role for role, _ in calls]
+        assert result.workflow_nodes.count("controller") == len(calls) + 1
         assert calls[0] == ("evidence", "collect_evidence")
         assert ("evidence", "collect_evidence") in calls
         assert calls.count(("diagnosis", "diagnose")) == 2

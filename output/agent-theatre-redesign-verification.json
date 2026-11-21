@@ -1,0 +1,47 @@
+{
+  "visual_review_disposition": "ship",
+  "full_suite_passed": 151,
+  "final_focused_checks_passed": 12,
+  "browser_errors": [],
+  "checked": [
+    "real offline investigation",
+    "robot and agent selector",
+    "work-log jump to timeline",
+    "play/pause/speed/stepping/scrub",
+    "replay stops at final event",
+    "paused packet and route animation",
+    "refresh preserves paused event",
+    "empty controls disabled",
+    "failed tasks stop active state",
+    "long complete log explanations",
+    "local table overflow"
+  ],
+  "layout_checks": [
+    {
+      "viewport_width": 320,
+      "overlapping_nodes": 0,
+      "page_overflow": false
+    },
+    {
+      "viewport_width": 390,
+      "overlapping_nodes": 0,
+      "page_overflow": false
+    },
+    {
+      "viewport_width": 520,
+      "overlapping_nodes": 0,
+      "page_overflow": false
+    },
+    {
+      "viewport_width": 768,
+      "overlapping_nodes": 0,
+      "page_overflow": false
+    },
+    {
+      "viewport_width": 1440,
+      "overlapping_nodes": 0,
+      "page_overflow": false
+    }
+  ],
+  "scope": "Template and local surface brief only; no model calls or backend changes."
+}

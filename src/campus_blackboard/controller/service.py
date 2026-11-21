@@ -98,6 +98,8 @@ def create_controller_app(
         return {
             "status": "ok",
             "service": "controller",
+            "orchestrator": "langgraph",
+            "agent_framework": "langchain",
             "model_mode": settings.model_mode,
             "model_name": settings.model_name if settings.model_mode == "live" else None,
         }

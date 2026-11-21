@@ -1,97 +1,164 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent theatre</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font:14px system-ui,sans-serif;color:#e6edf8;background:#0b1020}button,input,select{font:inherit}button,select{color:#e6edf8;background:#1c2842;border:1px solid #3b4c69;border-radius:8px;padding:8px 12px;cursor:pointer}button:hover{background:#2c3d5b}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #a6caff;outline-offset:3px}button:disabled{opacity:.4;cursor:default}.shell{border:1px solid #283551;border-radius:18px;overflow:hidden}.top{padding:21px 24px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px}.eyebrow{font-size:10px;letter-spacing:2px;color:#8ea4c6;font-weight:700}.top h1{font-size:23px;margin:5px 0}.sub{color:#9eafc8;font-size:12px}.badge{padding:7px 11px;border:1px solid #41506b;border-radius:30px;font-size:11px;white-space:nowrap}.badge:before{content:' ';display:inline-block;background:#71e4bb;width:6px;height:6px;border-radius:50%;margin-right:7px}.stage{height:410px;position:relative;margin:0 16px;background:radial-gradient(ellipse at center,#172846 0,transparent 64%),radial-gradient(#24304b 1px,transparent 1px);background-size:auto,20px 20px;border:1px solid #24314a;border-radius:12px}.wires{position:absolute;width:100%;height:100%;inset:0}.wire{stroke:#35435c;stroke-width:.45;fill:none}.route{stroke-width:.8;stroke-dasharray:2 3;animation:flow 1s linear infinite}.robot-card{position:absolute;width:25%;max-width:200px;min-width:125px;text-align:center;border:1px solid #35435c;background:#101b30;border-radius:13px;padding:12px 8px;transform:translate(-50%,-50%);transition:border-color .25s,box-shadow .25s}.robot-card[data-role=evidence]{left:20%;top:25%;--accent:#63d9ee}.robot-card[data-role=diagnosis]{left:80%;top:25%;--accent:#b29aff}.robot-card[data-role=review]{left:20%;top:75%;--accent:#ffce83}.robot-card[data-role=response]{left:80%;top:75%;--accent:#77e3ba}.robot-card.active{border-color:var(--accent);box-shadow:0 0 25px color-mix(in srgb,var(--accent) 20%,transparent)}.bot{width:44px;height:45px;color:var(--accent);margin:auto;display:block}.active .bot{animation:bob 1.5s ease-in-out infinite}.eye{transform-origin:center;animation:blink 5s infinite}.name{font-weight:650;margin-top:6px}.job{font-size:10px;color:#9eafc8;margin:3px 0 8px}.state{font-size:10px;color:var(--accent);min-height:14px}.dots{display:none}.active .dots{display:inline}.dots i{display:inline-block;width:3px;height:3px;background:currentColor;border-radius:50%;margin-left:3px;animation:dot 1s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:25%;max-width:190px;text-align:center;background:#192841;border:1px solid #5c789e;border-radius:16px;padding:18px 8px;box-shadow:0 0 45px #5599ff15}.hub svg{color:#a7caff;width:28px;height:28px}.hub strong{display:block;font-size:14px;margin:6px 0}.hub small{color:#9eafc8;font-size:10px}.hub .count{font-size:11px;margin-top:10px;color:#c4d7f3}.packet{fill:#b6d8ff;filter:drop-shadow(0 0 1px #a6caff)}.caption{display:flex;justify-content:space-between;gap:10px;padding:10px 24px;color:#9eafc8;font-size:11px}.controls{padding:13px 20px;display:flex;align-items:center;gap:8px;border-top:1px solid #27334c;flex-wrap:wrap}.controls input{flex:1;min-width:80px;accent-color:#a9caff}.controls label{font-size:11px;color:#9eafc8}.event-area{margin:0 20px 16px;border:1px solid #34435f;border-radius:10px;padding:15px;background:#111d32;min-height:128px}.event-top{display:flex;justify-content:space-between;font-size:10px;letter-spacing:1px;color:#a8c8f4}.event-area h2{font-size:16px;margin:10px 0 6px}.event-area p{font-size:12px;line-height:1.6;color:#c0cee2;margin:0;max-height:60px;overflow:auto;overflow-wrap:anywhere}.steps{display:flex;gap:7px;margin-top:12px;font-size:10px;color:#7c90af}.steps span{border-bottom:2px solid #32415b;padding-bottom:4px;flex:1}.steps .done{color:#a8cfec;border-color:#6aaad0}.note{color:#8da1bd;font-size:10px;padding:0 22px 15px;line-height:1.6}@keyframes flow{to{stroke-dashoffset:-10}}@keyframes bob{50%{transform:translateY(-4px)}}@keyframes blink{0%,44%,48%,100%{opacity:1}46%{opacity:.1}}@keyframes dot{50%{opacity:.2}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important}.packet{display:none}}@media(max-width:600px){.top{padding:16px}.top h1{font-size:18px}.sub{max-width:230px}.robot-card{min-width:100px;padding:9px 4px}.stage{height:390px;margin:0 8px}.hub{width:28%;padding:14px 4px}.hub strong{font-size:11px}.job{font-size:9px}.caption{padding:10px 14px}.controls{padding:12px}.event-area{margin:0 12px 12px}}
-
-.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(320px,1fr);gap:14px;margin:0 16px}.workspace .stage{margin:0;height:460px}.inspector{height:460px;display:flex;flex-direction:column;background:#101a2d;border:1px solid #34435f;border-radius:12px;overflow:hidden;--accent:#a8c8f4}.inspector-head{padding:15px 16px 11px;border-bottom:1px solid #293952}.inspector h2{font-size:18px;margin:5px 0 7px;color:var(--accent)}.inspector .intro{font-size:11px;color:#a9bad2;line-height:1.5}.agent-filters{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px}.agent-filters button{font-size:10px;padding:5px 8px;border-radius:20px}.agent-filters button[aria-pressed=true]{color:var(--accent);border-color:var(--accent);background:#24334c}.work-log{overflow:auto;flex:1;padding:12px 14px;scrollbar-color:#496181 #111d32;scrollbar-width:thin;overscroll-behavior:contain}.log-step{position:relative;border:1px solid #33425d;border-left:3px solid var(--step-color,#7b9fc9);border-radius:9px;margin-bottom:9px;background:#142038;animation:arrive .3s ease-out}.log-step summary{cursor:pointer;padding:11px;list-style:none}.log-step summary::-webkit-details-marker{display:none}.step-heading{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;line-height:1.4}.step-number{display:inline-flex;align-items:center;justify-content:center;min-width:21px;height:21px;border-radius:7px;background:#263752;color:var(--step-color);font-size:10px}.step-arrow{margin-left:auto;font-size:15px;color:#9db2d0}.log-step[open] .step-arrow{transform:rotate(90deg)}.step-meta{font-size:9px;color:#91a8c6;line-height:1.5;margin:6px 0 0 29px}.step-body{border-top:1px solid #2c3d57;padding:12px}.explanation{margin-bottom:13px}.explanation:last-child{margin-bottom:0}.explanation h3{font-size:11px;letter-spacing:.5px;color:var(--step-color);margin:0 0 5px}.explanation p{font-size:12px;line-height:1.65;margin:0;color:#d5e1f1;white-space:pre-wrap;overflow-wrap:anywhere}.provenance{font-size:9px;line-height:1.6;color:#91a8c6;overflow-wrap:anywhere;margin-top:12px}.log-empty{padding:24px 8px;color:#9eafc8;font-size:12px;line-height:1.8}.log-footer{font-size:10px;color:#9bb1d1;border-top:1px solid #293952;padding:9px 15px}.robot-card{cursor:pointer}.robot-card.selected{outline:2px solid var(--accent);outline-offset:3px}.robot-card .inspect-hint{font-size:9px;color:#aabbd2;margin-top:7px}.event-area p{max-height:110px}.event-area .steps{display:none}@keyframes arrive{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@media(max-width:980px){.workspace{grid-template-columns:1fr}.workspace .stage{height:390px}.inspector{height:440px}}@media(max-width:600px){.workspace{margin:0 8px;gap:10px}.inspector-head{padding:12px}.work-log{padding:10px}.robot-card .inspect-hint{font-size:8px}}@media(prefers-reduced-motion:reduce){.log-step{animation:none}}
-.record-table{overflow-x:auto;margin-top:7px}.record-table table{border-collapse:collapse;width:100%;font-size:10px;color:#d5e1f1}.record-table th{text-align:left;color:#a9bfdc;font-size:9px;padding:7px 6px;border-bottom:1px solid #455775}.record-table td{padding:8px 6px;border-bottom:1px solid #2b3d58;overflow-wrap:anywhere;max-width:180px}.raw-results{margin-top:9px;color:#9fb4d1;font-size:10px}.raw-results summary{padding:5px 0;cursor:pointer}.raw-results p{padding:8px;background:#0e182a;border-radius:6px}
-</style></head><body>
-<div class="shell"><header class="top"><div><div class="eyebrow">CAMPUS / AGENT THEATRE</div><h1>A team of specialists. One shared board.</h1><div class="sub">Watch the investigation move from evidence to a reviewed response.</div></div><span class="badge" id="mode">LIVE</span></header>
-<div class="workspace"><div class="stage"><svg class="wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="wire" d="M20 25L50 50L80 25 M20 75L50 50L80 75"/><path id="route" class="route" fill="none"/><circle id="packet" class="packet" r=".9"/></svg><div id="robots"></div><div class="hub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="15" rx="2"/><path d="M7 8h10M7 12h6M9 21l3-3 3 3"/></svg><strong>Shared Blackboard</strong><small>Controller coordinates tasks</small><div class="count" id="count">Waiting for events</div></div></div>
-<aside class="inspector" aria-label="Agent activity and explanations"><div class="inspector-head"><div class="eyebrow">RECORDED WORK · STEP BY STEP</div><h2 id="agent-title">Agent activity</h2><div class="intro">Select a robot to inspect its tasks, evidence, published explanations, and decisions.</div><div class="agent-filters" id="agent-filters" aria-label="Filter agent activity"></div></div><div class="work-log" id="work-log" aria-label="Recorded agent steps"></div><div class="log-footer" id="log-footer">Only events reached in Live or Replay are shown.</div></aside></div>
-<div class="caption"><span>● Task activity &nbsp; · &nbsp; Animated paths show board exchanges</span><span id="run-status"></span></div>
-<div class="controls"><button id="live">Live</button><button id="play">▶ Replay</button><button id="back" aria-label="Previous event">←</button><button id="next" aria-label="Next event">→</button><input id="scrub" aria-label="Investigation event" type="range" min="0" value="0"><label for="speed">Pace</label><select id="speed"><option value="3200">Slow</option><option value="1800" selected>Normal</option><option value="800">Fast</option></select></div>
-<section class="event-area" aria-label="Selected workflow event"><div class="event-top"><span id="speaker">CONTROLLER</span><span id="position">WAITING</span></div><h2 id="event-title">Ready for the first task</h2><p id="detail">Specialists will light up as the controller assigns work.</p></section>
-<div class="note">The work log shows recorded actions and published explanations, not private model reasoning. Open a step to inspect its evidence and outcome. Specialists exchange findings through the Blackboard; the controller dispatches one task at a time. Replay uses recorded events at presentation speed.</div></div>
+:root{color-scheme:dark;--canvas:#0b1020;--surface:#111e33;--field:#142039;--text:#e6edf8;--copy:#bdcee5;--muted:#9bb1cf;--border:#30425e;--blue:#a8caff;--focus:#b6d6ff}
+*{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--text);font:14px/1.6 system-ui,sans-serif}button,input,select{font:inherit}button,select{border:1px solid #3b5070;border-radius:8px;background:var(--field);color:var(--text)}button{cursor:pointer;min-height:40px;padding:8px 12px;display:inline-flex;align-items:center;justify-content:center;gap:8px}button:hover{background:#233752;border-color:#6e8caf}button:active{background:#2d4262}button:disabled{opacity:.45;cursor:default}button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:3px}select{min-height:40px;padding:7px 28px 7px 10px;max-width:100%}input[type=range]{accent-color:var(--blue);cursor:pointer;min-height:32px;min-width:90px;width:100%}input:disabled{cursor:default;opacity:.45}::selection{background:#3e6090;color:#fff}svg{display:block}.icon{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.theatre{border:1px solid var(--border);border-radius:14px;background:var(--canvas);overflow:hidden}.top{padding:20px 22px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.top h1{font-size:22px;line-height:1.3;letter-spacing:-.4px;margin:0 0 7px;font-weight:600}.top p{color:var(--muted);font-size:13px;margin:0;max-width:70ch}.mode{font-size:12px;border-radius:20px;padding:5px 10px;background:#1b2b44;color:#c4d9f7;border:1px solid #3b5275;white-space:nowrap}.transport{padding:12px 22px 16px;display:grid;grid-template-columns:auto minmax(130px,1fr) auto;align-items:center;gap:20px;border-bottom:1px solid var(--border)}.transport-buttons{display:flex;align-items:center;gap:6px}.transport-buttons .icon-button{padding:8px;width:40px}.transport-buttons button[aria-pressed=true]{background:var(--blue);color:#0c1830;border-color:var(--blue)}.transport-buttons .replay-button{min-width:105px}.timeline{min-width:0}.timeline-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;gap:10px}.timeline-labels label{color:#c2d6f2}.pace{display:flex;align-items:center;gap:8px}.pace label{font-size:12px;color:var(--muted)}.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;padding:20px 22px 0;align-items:start}.scene{min-width:0}.stage{position:relative;height:370px;border:1px solid var(--border);border-radius:12px;background:#101b2e;overflow:hidden}.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.wire{stroke:#405777;stroke-width:1;vector-effect:non-scaling-stroke;fill:none}.route{stroke-width:2;vector-effect:non-scaling-stroke;stroke-dasharray:5 7;fill:none;animation:flow 1.8s linear infinite}.packet{fill:#dfedff}.robot-card{position:absolute;transform:translate(-50%,-50%);display:block;text-align:left;min-height:90px;width:140px;max-width:32%;padding:11px;background:#142239;border:1px solid #3c526f;border-radius:12px;transition:background .18s,border-color .18s}.robot-card[data-role=evidence]{left:22%;top:22%;--accent:#63d9ee}.robot-card[data-role=diagnosis]{left:78%;top:22%;--accent:#b29aff}.robot-card[data-role=review]{left:22%;top:78%;--accent:#ffce83}.robot-card[data-role=response]{left:78%;top:78%;--accent:#77e3ba}.robot-card:hover{background:#1b2d46;border-color:var(--accent)}.robot-card.selected{border:2px solid var(--accent);padding:10px;background:#1b2b43}.robot-card.selected .node-selected{display:block}.node-selected{display:none;width:5px;height:5px;border-radius:50%;background:var(--accent);position:absolute;right:9px;top:9px}.node-heading{display:flex;align-items:center;gap:8px}.bot{width:29px;height:31px;color:var(--accent);flex-shrink:0}.node-name{font-size:14px;font-weight:600}.node-state{color:var(--muted);font-size:12px;margin-top:6px;display:flex;gap:6px;align-items:center}.robot-card.active .node-state{color:var(--accent)}.node-count{font-size:12px;color:#a8bdd9;margin-top:4px}.working-mark{display:none;height:4px;width:13px;background:var(--accent);border-radius:3px;animation:working 1.2s ease-in-out infinite}.active .working-mark{display:block}.active .eyes{animation:blink 3s infinite}.hub{display:block;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:31%;max-width:180px;text-align:center;border:1px solid #5d7da5;border-radius:12px;background:#1b2c46;padding:13px 8px}.hub:hover{background:#263d5b;border-color:#a8caff}.hub.selected{border:2px solid var(--blue);background:#243b59}.hub .icon{width:24px;height:24px;margin:0 auto 6px;color:#b8d6ff}.hub strong{font-size:14px;line-height:1.4;display:block;font-weight:600}.hub small{font-size:12px;color:#aac2e2;display:block;margin-top:5px}.stage-caption{font-size:12px;color:var(--muted);padding:10px 0}.event-area{padding:14px 0 0;border-top:1px solid var(--border);min-width:0}.event-meta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px}.event-area h2{font-size:18px;line-height:1.5;letter-spacing:-.2px;font-weight:600;margin:8px 0}.event-area p{margin:0;color:var(--copy);font-size:14px;line-height:1.8;overflow-wrap:anywhere;white-space:pre-wrap;max-width:72ch}.inspector{height:580px;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:12px;background:var(--surface);overflow:hidden;min-width:0;--accent:var(--blue)}.inspector-head{padding:16px 18px;border-bottom:1px solid var(--border)}.inspector-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.inspector h2{font-size:20px;font-weight:600;letter-spacing:-.3px;line-height:1.4;margin:0}.log-count{font-size:12px;color:var(--muted);white-space:nowrap}.agent-choice{display:flex;align-items:center;gap:10px;margin-top:12px}.agent-choice label{font-size:12px;color:var(--muted);flex-shrink:0}.agent-choice select{width:100%;min-width:0}.work-log{padding:0 18px;overflow-y:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#6988ae var(--surface)}.log-step{border-bottom:1px solid #344964;min-width:0}.log-step:last-child{border-bottom:none}.log-step summary{list-style:none;cursor:pointer;padding:15px 0;min-height:48px}.log-step summary::-webkit-details-marker{display:none}.step-heading{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.5;font-weight:600}.step-number{font-size:12px;color:var(--step-color);font-variant-numeric:tabular-nums;min-width:22px}.step-chevron{width:15px;height:15px;color:#a6bedf;margin-left:auto;flex-shrink:0}.log-step[open] .step-chevron{transform:rotate(90deg)}.step-meta{color:var(--muted);font-size:12px;margin:5px 0 0 32px;line-height:1.6}.step-body{padding:0 0 18px}.explanation{margin:0 0 17px}.explanation h3{font-size:12px;font-weight:600;color:var(--step-color);margin:0 0 5px;line-height:1.6}.explanation p{font-size:14px;line-height:1.8;color:#d5e1f1;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;max-width:72ch}.provenance{color:#a0b7d6;font-size:12px;line-height:1.8;overflow-wrap:anywhere;margin:12px 0}.jump-button{font-size:12px;min-height:36px;padding:6px 10px}.log-empty{padding:30px 0;color:var(--muted);font-size:14px;line-height:1.8}.log-footer{border-top:1px solid var(--border);padding:10px 18px;color:var(--muted);font-size:12px}.record-table{overflow-x:auto;scrollbar-width:thin;margin-top:9px}.record-table table{width:100%;min-width:350px;border-collapse:collapse;font-size:13px}.record-table th{text-align:left;color:#a9c0df;font-size:12px;font-weight:600;padding:8px;border-bottom:1px solid #526988}.record-table td{padding:10px 8px;border-bottom:1px solid #30445f;overflow-wrap:anywhere;max-width:220px}.record-table td:nth-child(2){white-space:nowrap;font-variant-numeric:tabular-nums;color:#d5e6ff}.raw-results{margin-top:10px;font-size:12px;color:#b0c7e7}.raw-results summary{padding:8px 0;cursor:pointer}.raw-results p{font-size:13px;padding-top:8px}.note{margin:20px 22px 16px;padding-top:12px;border-top:1px solid var(--border);color:#9eb5d4;font-size:12px;line-height:1.8}.motion-paused .route,.motion-paused .working-mark,.motion-paused .eyes{animation-play-state:paused}@keyframes flow{to{stroke-dashoffset:-24}}@keyframes working{50%{opacity:.35}}@keyframes blink{0%,44%,48%,100%{opacity:1}46%{opacity:.2}}
+@media(max-width:1000px){.workspace{grid-template-columns:1fr}.inspector{height:540px}.scene{padding-bottom:5px}.transport{grid-template-columns:auto 1fr;gap:12px}.timeline{grid-column:1 / -1;grid-row:2}.pace{justify-content:flex-end}.stage{height:350px}.robot-card{max-width:28%;width:155px}.robot-card[data-role=evidence],.robot-card[data-role=diagnosis]{top:16%}.robot-card[data-role=review],.robot-card[data-role=response]{top:84%}}
+@media(max-width:500px){.top{padding:16px 14px 10px;gap:10px;flex-wrap:wrap}.top h1{font-size:20px}.top p{font-size:13px}.transport{padding:12px 14px;gap:12px 8px}.transport-buttons{gap:4px;flex-wrap:wrap}.transport-buttons .replay-button{min-width:90px}.transport-buttons button{padding:8px;font-size:13px}.pace{align-items:flex-end;flex-direction:column;gap:4px}.pace select{padding-right:24px;width:100px;max-width:100px;font-size:13px}.pace label{font-size:12px}.workspace{padding:14px 12px 0;gap:18px}.stage{height:350px}.robot-card{width:108px;max-width:39%;padding:10px 7px;min-height:86px}.robot-card.selected{padding:9px 6px}.node-heading{gap:5px}.bot{width:25px;height:28px}.node-name{font-size:13px}.node-state,.node-count{font-size:12px}.hub{width:34%;padding:10px 5px}.hub strong{font-size:13px}.hub small{font-size:12px}.inspector{height:540px}.inspector-head{padding:14px}.inspector h2{font-size:18px}.work-log{padding:0 14px}.agent-choice{align-items:flex-start;flex-direction:column;gap:5px}.event-meta{flex-wrap:wrap}.note{margin:16px 14px}.log-footer{padding:10px 14px}}
+@media(max-width:380px){.stage{height:380px}.robot-card[data-role=evidence],.robot-card[data-role=diagnosis]{top:16%}.robot-card[data-role=review],.robot-card[data-role=response]{top:84%}.transport{grid-template-columns:1fr}.transport-buttons{justify-content:flex-start}.pace{grid-row:3;flex-direction:row;align-items:center;justify-content:flex-end}.timeline{grid-column:1;grid-row:2}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.packet{display:none}}
+</style>
+</head>
+<body>
+<main class="theatre" id="theatre">
+<header class="top"><div><h1>Agent theatre</h1><p>Follow task assignments, shared findings, and reviewed decisions.</p></div><span class="mode" id="mode">Live view</span></header>
+<div class="transport" aria-label="Investigation playback">
+<div class="transport-buttons">
+<button id="live" aria-pressed="true">Live</button>
+<button id="play" class="replay-button" aria-label="Replay investigation"><svg class="icon" id="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg><span id="play-label">Replay</span></button>
+<button id="back" class="icon-button" aria-label="Previous event"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+<button id="next" class="icon-button" aria-label="Next event"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
+</div>
+<div class="timeline"><div class="timeline-labels"><label for="scrub">Investigation timeline</label><span id="position">No events yet</span></div><input id="scrub" aria-label="Investigation event" type="range" min="0" value="0"></div>
+<div class="pace"><label for="speed">Replay pace</label><select id="speed"><option value="3200">Slow</option><option value="1800" selected>Normal</option><option value="800">Fast</option></select></div>
+</div>
+<div class="workspace">
+<div class="scene">
+<div class="stage" aria-label="Specialists exchange findings through the shared Blackboard">
+<svg class="wires" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path class="wire" d="M22 22L50 50L78 22 M22 78L50 50L78 78"/><path id="route" class="route"/><circle id="packet" class="packet" r=".8"/></svg>
+<div id="robots"></div>
+<button type="button" class="hub" id="blackboard" aria-label="Inspect shared Blackboard findings" aria-pressed="false" aria-controls="work-log"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="15" rx="2"/><path d="M7 8h10M7 12h6M9 21l3-3 3 3"/></svg><strong>Shared Blackboard</strong><small id="count">No findings yet</small></button>
+</div>
+<div class="stage-caption">The controller assigns one specialist task at a time.</div>
+<section class="event-area" aria-label="Selected workflow event"><div class="event-meta"><span id="speaker">Controller</span><span id="run-status">Waiting</span></div><h2 id="event-title">Ready for the first task</h2><p id="detail">The first assignment will appear when the controller starts work.</p></section>
+</div>
+<aside class="inspector" aria-label="Agent activity and explanations">
+<header class="inspector-head"><div class="inspector-heading"><h2 id="agent-title">Agent work log</h2><span class="log-count" id="log-count">0 steps</span></div><div class="agent-choice"><label for="agent-filter">Show work for</label><select id="agent-filter"><option value="follow">Follow current agent</option><option value="all">All agents</option><option value="blackboard">Shared Blackboard findings</option><option value="evidence">Evidence</option><option value="diagnosis">Diagnosis</option><option value="review">Review</option><option value="response">Response</option></select></div></header>
+<div class="work-log" id="work-log" aria-label="Recorded agent steps"></div><div class="log-footer" id="log-footer">Only recorded events reached so far are shown.</div>
+</aside>
+</div>
+<footer class="note">Select a robot to inspect its work, or the Shared Blackboard to browse published findings. The log shows recorded actions and published explanations, not private model reasoning. Replay presents the recorded sequence at a chosen pace; it does not start tasks or call a model.</footer>
+</main>
 <script>
 const payload = __THEATRE_DATA__;
 const events=payload.events, $=id=>document.getElementById(id);
-const roles=[['evidence','Evidence','Gather observations','#63d9ee',20,25],['diagnosis','Diagnosis','Build & revise hypotheses','#b29aff',80,25],['review','Review','Challenge & verify','#ffce83',20,75],['response','Response','Propose recovery steps','#77e3ba',80,75]];
-const bot=`<svg class="bot" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M24 6v6"/><circle cx="24" cy="5" r="2" fill="currentColor"/><rect x="8" y="12" width="32" height="25" rx="8"/><path d="M4 21v9m40-9v9M16 41h16"/><g class="eye"><rect x="15" y="21" width="4" height="5" rx="2" fill="currentColor"/><rect x="29" y="21" width="4" height="5" rx="2" fill="currentColor"/></g><path d="M20 31h8"/></svg>`;
-roles.forEach(([role,name,job])=>{const card=document.createElement('button');card.type='button';card.className='robot-card';card.dataset.role=role;card.setAttribute('aria-label','Inspect '+name+' agent');card.setAttribute('aria-pressed','false');card.onclick=()=>{state.selectedRole=role;$('work-log').scrollTop=0;render()};card.innerHTML=bot+`<div class="name">${name}</div><div class="job">${job}</div><div class="state"><span>Standing by</span><span class="dots"><i></i><i></i><i></i></span></div><div class="inspect-hint">View work log ↗</div>`;$('robots').appendChild(card)});
-let state={mode:'live',index:Math.max(0,events.length-1),playing:false,pace:1800,tick:Date.now(),selectedRole:'follow',openSteps:{}};
+const roles=[['evidence','Evidence','#63d9ee',22,22],['diagnosis','Diagnosis','#b29aff',78,22],['review','Review','#ffce83',22,78],['response','Response','#77e3ba',78,78]];
+const icons={play:'<path d="m8 5 11 7-11 7z"/>',pause:'<path d="M8 5v14M16 5v14"/>',chevron:'<path d="m9 5 7 7-7 7"/>'};
+const bot='<svg class="bot" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M24 6v6"/><circle cx="24" cy="5" r="2" fill="currentColor"/><rect x="8" y="12" width="32" height="25" rx="8"/><path d="M4 21v9m40-9v9M16 41h16"/><g class="eyes"><rect x="15" y="21" width="4" height="5" rx="2" fill="currentColor"/><rect x="29" y="21" width="4" height="5" rx="2" fill="currentColor"/></g><path d="M20 31h8"/></svg>';
+function element(tag,cls,value){const node=document.createElement(tag);if(cls)node.className=cls;if(value!==undefined)node.textContent=value;return node}
+function icon(name,cls='icon'){const holder=element('span');holder.innerHTML=`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;return holder.firstElementChild}
 const storageKey='campus-theatre:'+payload.id;
-try{const saved=JSON.parse(sessionStorage.getItem(storageKey));if(saved)Object.assign(state,saved)}catch{}
-state.index=Math.max(0,Math.min(state.index,Math.max(0,events.length-1)));
-if(!state.openSteps||typeof state.openSteps!=='object')state.openSteps={};
-if(!['follow','all',...roles.map(r=>r[0])].includes(state.selectedRole))state.selectedRole='follow';
-$('speed').value=String(state.pace);$('scrub').max=Math.max(0,events.length-1);
+let state={mode:'live',index:Math.max(0,events.length-1),playing:false,pace:1800,tick:Date.now(),selectedRole:'follow',openSteps:{}};
+try{const saved=JSON.parse(sessionStorage.getItem(storageKey));if(saved&&typeof saved==='object')Object.assign(state,saved)}catch{}
+if(!['live','replay'].includes(state.mode))state.mode='live';
+if(!Number.isFinite(state.index))state.index=0;
+state.index=Math.max(0,Math.min(Math.floor(state.index),Math.max(0,events.length-1)));
+if(![800,1800,3200].includes(state.pace))state.pace=1800;
+if(!Number.isFinite(state.tick))state.tick=Date.now();
+if(!state.openSteps||typeof state.openSteps!=='object'||Array.isArray(state.openSteps))state.openSteps={};
+if(!['follow','all','blackboard',...roles.map(role=>role[0])].includes(state.selectedRole))state.selectedRole='follow';
+state.playing=Boolean(state.playing&&state.mode==='replay'&&events.length&&state.index<events.length-1);
 function save(){try{sessionStorage.setItem(storageKey,JSON.stringify(state))}catch{}}
-function element(tag,cls,text){const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node}
-[['follow','Follow active'],['all','All agents'],...roles.map(r=>[r[0],r[1]])].forEach(([role,label])=>{const button=element('button','',label);button.type='button';button.dataset.filter=role;button.onclick=()=>{state.selectedRole=role;$('work-log').scrollTop=0;render()};$('agent-filters').appendChild(button)});
-function renderWorkLog(visible,event){
- const latest=visible.slice().reverse().find(e=>e.role!=='controller');
+function chooseAgent(role){state.selectedRole=role;$('work-log').scrollTop=0;render()}
+roles.forEach(([role,name])=>{
+ const card=element('button','robot-card');card.type='button';card.dataset.role=role;card.setAttribute('aria-label','Inspect '+name+' agent');card.setAttribute('aria-pressed','false');
+ card.innerHTML=`<span class="node-selected" aria-hidden="true"></span><span class="node-heading">${bot}<span class="node-name">${name}</span></span><span class="node-state"><span class="working-mark" aria-hidden="true"></span><span class="state-label">Standing by</span></span><span class="node-count">0 findings</span>`;
+ card.onclick=()=>chooseAgent(role);$('robots').appendChild(card);
+});
+function eventTitle(event){return {'Observation shared':'Evidence published','Hypothesis shared':'Hypothesis published','Review shared':'Review published','Solution shared':'Response proposed','Evidence Request shared':'More evidence requested'}[event.title]||event.title}
+function formatTime(value){const moment=new Date(value);return value&&!Number.isNaN(moment.getTime())?moment.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):value||''}
+function renderSection(section,body){
+ const block=element('div','explanation');block.appendChild(element('h3','',section.label));
+ if(section.records?.length&&section.records.every(record=>record&&typeof record==='object'&&!Array.isArray(record))){
+  const wrap=element('div','record-table'),table=element('table'),head=element('thead'),heading=element('tr');wrap.tabIndex=0;wrap.setAttribute('role','region');wrap.setAttribute('aria-label','Recorded tool results');
+  ['Measurement','Value','Unit'].forEach(label=>{const cell=element('th','',label);cell.scope='col';heading.appendChild(cell)});head.appendChild(heading);table.appendChild(head);
+  const rows=element('tbody');section.records.forEach(record=>{const row=element('tr');[record.name??record.message??record.event??'Record',record.value??record.status??'—',record.unit??'—'].forEach(value=>row.appendChild(element('td','',typeof value==='object'?JSON.stringify(value):String(value))));rows.appendChild(row)});table.appendChild(rows);wrap.appendChild(table);block.appendChild(wrap);
+  const raw=element('details','raw-results');raw.append(element('summary','','Complete tool output and sources'),element('p','',section.text));block.appendChild(raw);
+ }else block.appendChild(element('p','',section.text));
+ body.appendChild(block);
+}
+function sharedFindings(visible){
+ const latest=new Map();
+ visible.forEach((event,index)=>{if(event.phase==='published')latest.set(event.reference||'event:'+index,{event,index})});
+ return [...latest.values()].sort((a,b)=>b.index-a.index);
+}
+function renderWorkLog(visible){
+ const latest=visible.slice().reverse().find(event=>event.role!=='controller');
  const selected=state.selectedRole==='follow'?(latest?.role||'evidence'):state.selectedRole;
- const roleInfo=roles.find(r=>r[0]===selected);
- const inspector=document.querySelector('.inspector');inspector.style.setProperty('--accent',roleInfo?roleInfo[3]:'#a8c8f4');
- $('agent-title').textContent=roleInfo?roleInfo[1]+' · Work log':'All agents · Work log';
- document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===state.selectedRole)));
- document.querySelectorAll('.robot-card').forEach(card=>{const chosen=card.dataset.role===selected;card.classList.toggle('selected',chosen);card.setAttribute('aria-pressed',String(chosen))});
- const items=visible.map((e,index)=>({e,index})).filter(({e})=>selected==='all'||e.role===selected).reverse();
- const preferred=items.find(({e})=>e.phase==='published')||items[0];
+ const info=roles.find(role=>role[0]===selected);
+ const boardSelected=selected==='blackboard';
+ $('agent-title').textContent=boardSelected?'Shared findings':info?info[1]+' work log':'All agents';$('agent-filter').value=state.selectedRole;
+ $('blackboard').classList.toggle('selected',boardSelected);$('blackboard').setAttribute('aria-pressed',String(boardSelected));
+ $('work-log').setAttribute('aria-label',boardSelected?'Shared Blackboard findings':'Recorded agent steps');
+ document.querySelectorAll('.robot-card').forEach(card=>{const chosen=card.dataset.role===selected;card.classList.toggle('selected',chosen);card.setAttribute('aria-pressed',String(chosen));card.setAttribute('aria-label','Inspect '+roles.find(role=>role[0]===card.dataset.role)[1]+' agent'+(chosen?' (selected)':''))});
+ const items=boardSelected?sharedFindings(visible):visible.map((event,index)=>({event,index})).filter(({event})=>selected==='all'||event.role===selected).reverse();
+ const preferred=items.find(({event})=>event.phase==='published')||items[0];
  const log=$('work-log'),previousScroll=log.scrollTop;log.replaceChildren();
- if(!items.length)log.appendChild(element('div','log-empty','No recorded steps for this agent yet. Its work will appear when the controller assigns a task.'));
- items.forEach(({e,index},i)=>{
-  const info=roles.find(r=>r[0]===e.role),step=element('details','log-step');step.style.setProperty('--step-color',info?info[3]:'#a8c8f4');
-  step.open=state.openSteps[index]===undefined?index===preferred.index:state.openSteps[index];
-  const summary=element('summary'),heading=element('div','step-heading');heading.append(element('span','step-number',String(index+1)),element('span','',e.title),element('span','step-arrow','›'));summary.appendChild(heading);
-  const timestamp=e.time?new Date(e.time):null;const timeText=timestamp&&!Number.isNaN(timestamp.getTime())?timestamp.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}):e.time;
-  summary.appendChild(element('div','step-meta',(info?info[1]+' agent':'Controller')+(e.revision?' · revision '+e.revision:'')+(timeText?' · '+timeText:'')));
-  step.appendChild(summary);const body=element('div','step-body');
-  const sections=e.sections?.length?e.sections:[{label:'Recorded update',text:e.detail||'No additional explanation was recorded.'}];
-  sections.forEach(section=>{
-   const block=element('div','explanation');block.appendChild(element('h3','',section.label));
-   if(section.records?.length&&section.records.every(r=>r&&typeof r==='object'&&!Array.isArray(r))){
-    const wrap=element('div','record-table'),table=element('table'),thead=element('thead'),head=element('tr');
-    ['Measurement','Value','Unit'].forEach(label=>head.appendChild(element('th','',label)));thead.appendChild(head);table.appendChild(thead);
-    const rows=element('tbody');section.records.forEach(record=>{const row=element('tr');[record.name??record.message??record.event??'Record',record.value??record.status??'—',record.unit??'—'].forEach(value=>row.appendChild(element('td','',typeof value==='object'?JSON.stringify(value):String(value))));rows.appendChild(row)});table.appendChild(rows);wrap.appendChild(table);block.appendChild(wrap);
-    const raw=element('details','raw-results');raw.append(element('summary','','Complete tool output and sources'),element('p','',section.text));block.appendChild(raw);
-   }else block.appendChild(element('p','',section.text));
-   body.appendChild(block);
-  });
-  body.appendChild(element('div','provenance','Blackboard entry: '+(e.reference||'not recorded')+(e.dispatch?' · Task: '+e.dispatch:'')));
-  step.appendChild(body);log.appendChild(step);const initiallyOpen=step.open;step.addEventListener('toggle',()=>{if(step.open!==initiallyOpen||state.openSteps[index]!==undefined){state.openSteps[index]=step.open;save()}});
+ if(!items.length)log.appendChild(element('p','log-empty',boardSelected?'No shared findings at this point. Evidence, hypotheses, reviews, requests, and response proposals will appear here as agents publish them.':'No recorded work for this agent at this point. Its assignments and findings will appear here as the investigation progresses.'));
+ items.forEach(({event,index})=>{
+  const role=roles.find(role=>role[0]===event.role),step=element('details','log-step');step.style.setProperty('--step-color',role?role[2]:'#a8caff');
+  step.open=state.openSteps[index]===undefined?index===preferred.index:Boolean(state.openSteps[index]);
+  const summary=element('summary'),heading=element('div','step-heading');heading.append(element('span','step-number',String(index+1)),element('span','',eventTitle(event)),icon('chevron','step-chevron'));summary.appendChild(heading);
+  const metadata=[role?role[1]+' agent':'Controller',event.revision?'Revision '+event.revision:'',formatTime(event.time)].filter(Boolean).join(' · ');summary.appendChild(element('div','step-meta',metadata));step.appendChild(summary);
+  const body=element('div','step-body');
+  const sections=event.sections?.length?event.sections:[{label:'Recorded update',text:event.detail||'No additional explanation was recorded.'}];sections.forEach(section=>renderSection(section,body));
+  body.appendChild(element('div','provenance','Blackboard entry: '+(event.reference||'not recorded')+(event.dispatch?'\nTask: '+event.dispatch:'')));
+  const jump=element('button','jump-button','Show on timeline');jump.type='button';jump.setAttribute('aria-label','Show event '+(index+1)+' on timeline');jump.onclick=()=>seek(index);body.appendChild(jump);step.appendChild(body);log.appendChild(step);
+  const initial=step.open;step.addEventListener('toggle',()=>{if(step.open!==initial||state.openSteps[index]!==undefined){state.openSteps[index]=step.open;save()}});
  });
- log.scrollTop=previousScroll;
- $('log-footer').textContent=items.length+' recorded '+(items.length===1?'step':'steps')+' · through event '+(events.length?state.index+1:0)+' of '+events.length+' · newest first';
+ log.scrollTop=previousScroll;$('log-count').textContent=items.length+' '+(boardSelected?(items.length===1?'finding':'findings'):(items.length===1?'step':'steps'));
+ $('log-footer').textContent='Through event '+(events.length?state.index+1:0)+' of '+events.length+(boardSelected?' · latest revisions · newest first':' · newest first');
 }
 let route=null;
+const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 function render(){
  if(state.mode==='live')state.index=Math.max(0,events.length-1);
  const visible=events.slice(0,state.index+1),event=events[state.index];
- const active=new Map(),seen=new Set(),failed=new Set();let terminal=false;
- visible.forEach(e=>{if(e.phase==='terminal'){active.clear();terminal=true}if(e.role==='controller')return;seen.add(e.role);if(e.phase==='started'){active.set(e.role,e.dispatch);failed.delete(e.role)}if(['finished','failed'].includes(e.phase)&&active.get(e.role)===e.dispatch){active.delete(e.role)}if(e.phase==='failed')failed.add(e.role)});
- const stopped=state.mode==='live'&&['completed','blocked','unresolved'].includes(payload.status);
- if(stopped)active.clear();
- document.querySelectorAll('.robot-card').forEach(card=>{const r=card.dataset.role,isActive=active.has(r);card.classList.toggle('active',isActive);card.querySelector('.state span').textContent=failed.has(r)?'Task failed':isActive?'Working on task':seen.has(r)?'Work recorded':'Standing by'});
- $('mode').textContent=state.mode==='live'?'LIVE VIEW':state.playing?'REPLAYING':'REPLAY PAUSED';
- $('run-status').textContent=state.mode==='live'?payload.status.replaceAll('_',' '):'Recorded history';
- $('count').textContent=visible.filter(e=>e.phase==='published').length+' shared findings';
- $('speaker').textContent=event?(event.role==='controller'?'CONTROLLER':event.role.toUpperCase()+' AGENT'):'CONTROLLER';
- $('position').textContent=events.length?`${state.index+1} / ${events.length} EVENTS`:'WAITING';
- $('event-title').textContent=event?event.title:'Ready for the first task';$('detail').textContent=event?event.detail:'Specialists will light up as the controller assigns work.';
- $('scrub').value=state.index;$('play').textContent=state.playing?'Ⅱ Pause':'▶ Replay';
- ['play','back','next','scrub'].forEach(id=>$(id).disabled=!events.length);
+ const active=new Map(),seen=new Set(),failed=new Set(),findings=new Map(),tasks=new Map();let terminal=false;
+ visible.forEach(item=>{
+  if(item.phase==='terminal'){active.clear();terminal=true}if(item.role==='controller')return;seen.add(item.role);
+  if(item.phase==='published')findings.set(item.role,(findings.get(item.role)||0)+1);
+  if(item.phase==='started'){active.set(item.role,item.dispatch);failed.delete(item.role);tasks.set(item.role,(tasks.get(item.role)||0)+1)}
+  if(['finished','failed'].includes(item.phase)&&active.get(item.role)===item.dispatch)active.delete(item.role);
+  if(item.phase==='failed')failed.add(item.role);
+ });
+ const stopped=state.mode==='live'&&['completed','blocked','unresolved'].includes(payload.status);if(stopped)active.clear();
+ document.querySelectorAll('.robot-card').forEach(card=>{
+  const role=card.dataset.role,working=active.has(role);card.classList.toggle('active',working);
+  card.querySelector('.state-label').textContent=failed.has(role)?'Task failed':working?'Working':seen.has(role)?'Work recorded':'Standing by';
+  const count=findings.get(role)||0;card.querySelector('.node-count').textContent=count+' '+(count===1?'finding':'findings');
+  const assigned=tasks.get(role)||0;card.title=assigned+' assigned '+(assigned===1?'task':'tasks')+'; '+count+' shared '+(count===1?'finding':'findings')+'. Select to inspect this agent.';
+ });
+ $('theatre').classList.toggle('motion-paused',state.mode==='replay'&&!state.playing);
+ $('mode').textContent=state.mode==='live'?'Live view':state.playing?'Replaying':'Replay paused';
+ $('live').setAttribute('aria-pressed',String(state.mode==='live'));
+ $('play-label').textContent=state.playing?'Pause':state.mode==='replay'&&state.index<events.length-1?'Play':'Replay';
+ $('play-icon').innerHTML=state.playing?icons.pause:icons.play;$('play').setAttribute('aria-label',state.playing?'Pause replay':'Replay investigation');
+ $('scrub').max=Math.max(0,events.length-1);$('scrub').value=state.index;$('speed').value=String(state.pace);
+ $('position').textContent=events.length?'Event '+(state.index+1)+' of '+events.length:'No events yet';
+ ['play','back','next','scrub','speed'].forEach(id=>$(id).disabled=!events.length);
  $('back').disabled=!events.length||state.index===0;$('next').disabled=!events.length||state.index===events.length-1;
- document.querySelectorAll('.steps span').forEach((el,i)=>el.classList.toggle('done',!!event&&event.role!=='controller'&&i<({started:2,published:3,finished:3,failed:2}[event.phase]||0)));
- route=null;
- if(event&&event.role!=='controller'&&!terminal&&!stopped){const r=roles.find(r=>r[0]===event.role);const inbound=event.phase==='started';route=inbound?[50,50,r[4],r[5]]:[r[4],r[5],50,50];$('route').setAttribute('d',`M${route[0]} ${route[1]}L${route[2]} ${route[3]}`);$('route').setAttribute('stroke',r[3]);}
- $('route').style.display=route?'':'none';$('packet').style.display=route?'':'none';renderWorkLog(visible,event);save();
+ const role=event&&roles.find(role=>role[0]===event.role);
+ $('speaker').textContent=role?role[1]+' agent':'Controller';
+ $('run-status').textContent=state.mode==='live'?String(payload.status).replaceAll('_',' '):'Recorded event';
+ const published=sharedFindings(visible).length;$('count').textContent=published+' shared '+(published===1?'finding':'findings');
+ $('event-title').textContent=event?eventTitle(event):'Ready for the first task';
+ $('detail').textContent=event?event.detail:'The first assignment will appear when the controller starts work.';
+ route=null;if(role&&!terminal&&!stopped){route=event.phase==='started'?[50,50,role[3],role[4]]:[role[3],role[4],50,50];$('route').setAttribute('d',`M${route[0]} ${route[1]}L${route[2]} ${route[3]}`);$('route').setAttribute('stroke',role[2])}
+ $('route').style.display=route?'':'none';$('packet').style.display=route&&!reducedMotion.matches?'':'none';renderWorkLog(visible);save();
 }
+function seek(index){state.mode='replay';state.playing=false;state.index=Math.max(0,Math.min(index,events.length-1));render()}
+$('agent-filter').onchange=event=>chooseAgent(event.target.value);
+$('blackboard').onclick=()=>chooseAgent('blackboard');
 $('live').onclick=()=>{state.mode='live';state.playing=false;render()};
 $('play').onclick=()=>{state.mode='replay';state.playing=!state.playing;if(state.playing&&state.index>=events.length-1)state.index=0;state.tick=Date.now();render()};
-function seek(index){state.mode='replay';state.playing=false;state.index=index;render()}
-$('back').onclick=()=>seek(Math.max(0,state.index-1));$('next').onclick=()=>seek(Math.min(events.length-1,state.index+1));$('scrub').oninput=e=>seek(Number(e.target.value));$('speed').onchange=e=>{state.pace=Number(e.target.value);save()};
+$('back').onclick=()=>seek(state.index-1);$('next').onclick=()=>seek(state.index+1);$('scrub').oninput=event=>seek(Number(event.target.value));$('speed').onchange=event=>{state.pace=Number(event.target.value);state.tick=Date.now();save()};
 setInterval(()=>{if(state.playing&&Date.now()-state.tick>=state.pace){const advance=Math.floor((Date.now()-state.tick)/state.pace);state.index=Math.min(events.length-1,state.index+advance);state.tick=Date.now();if(state.index>=events.length-1)state.playing=false;render()}},100);
-function animate(t){if(route){const f=(t%1800)/1800;$('packet').setAttribute('cx',route[0]+(route[2]-route[0])*f);$('packet').setAttribute('cy',route[1]+(route[3]-route[1])*f)}requestAnimationFrame(animate)}render();requestAnimationFrame(animate);
-</script></body></html>
+function animate(time){if(route&&!reducedMotion.matches){const fraction=state.mode==='replay'&&!state.playing ? 0.5 : (time%1800)/1800;$('packet').setAttribute('cx',route[0]+(route[2]-route[0])*fraction);$('packet').setAttribute('cy',route[1]+(route[3]-route[1])*fraction)}requestAnimationFrame(animate)}
+reducedMotion.addEventListener('change',render);render();requestAnimationFrame(animate);
+</script>
+</body>
+</html>

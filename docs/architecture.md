@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TD
     User --> UI[Streamlit dashboard]
-    UI -->|HTTP: start and status| API[Controller REST API]
+    UI -->|HTTP: start and status| API[Controller REST API + LangGraph]
     UI -->|A2A JSON-RPC: read only| B[Blackboard service]
     API -->|A2A JSON-RPC| B
     API -->|A2A JSON-RPC tasks| E[Evidence specialist]
@@ -26,6 +26,14 @@ flowchart TD
 Only the Blackboard repository opens SQLite. The dashboard uses a read-only `dashboard` identity over A2A. The controller uses the configured `controller` identity for state changes and dispatches. The four specialists use their own configured identity and write only through Blackboard actions.
 
 The controller exposes `GET /cases`, `POST /runs`, `GET /runs/{problem_id}`, and `GET /health`. It stores no knowledge independently: every decision begins with `read_blackboard`, is written as a `controller_decision`, and then the board is read again after a task. Dashboard refresh reads status and board state; it never starts work.
+
+## LangGraph and LangChain
+
+The controller runs a compiled LangGraph `StateGraph`: `START → controller → selected specialist → controller`, with a conditional `finish → END` route. Specialist nodes call independent A2A services. The pure scheduler supplies the conditional routing policy; LangGraph executes the workflow. Run results include `orchestrator` and the actual `workflow_nodes` visited. Controller dispatch audit records identify their graph node.
+
+Each specialist uses a LangChain `ChatPromptTemplate → CampusChatModel → StrOutputParser` chain. The custom chat model delegates to the configured Codex CLI, OpenAI-compatible, or offline provider adapter, preserving cancellation and measured usage. Existing domain validation and one repair attempt run after the chain. Fixture queries and runbook search are LangChain structured tools with strict argument schemas and the existing source provenance.
+
+Graph state is scoped to one invocation. SQLite through the Blackboard remains the durable knowledge store; this implementation does not configure a LangGraph checkpointer or claim durable graph resume. See [framework implementation details](langgraph-langchain.md).
 
 ## Scheduling rules
 
